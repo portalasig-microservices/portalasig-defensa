@@ -1014,7 +1014,7 @@ body.anno-review-open .anno-review-close{ display: block; }
       <div class="media media-left">
         <div class="txt">
           <ul class="bullets" style="font-size:21px">
-            <li><b>50 usuarios virtuales</b>, 3 escenarios con endpoints equivalentes en ambas arquitecturas</li>
+            <li><b>50 usuarios virtuales</b>, 3 escenarios con endpoints equivalentes; ambas arquitecturas desplegadas en local con idénticos recursos</li>
             <li>Métricas: <b>p95/p99, throughput, tasa de error</b> + CPU/memoria en Prometheus</li>
             <li>Hipótesis: el monolito exhibe <b>mayor latencia</b> bajo concurrencia</li>
           </ul>
@@ -1025,7 +1025,7 @@ body.anno-review-open .anno-review-close{ display: block; }
         </figure>
       </div>
     </div>
-    <aside class="notes">Diseño experimental con k6: mismos escenarios y misma carga contra ambas arquitecturas, tokens JWT reales y datos sintéticos. Con honestidad: el monolito en producción no podía someterse a carga real, así que la comparación queda acotada a los escenarios definidos —es una de las limitaciones declaradas.</aside>
+    <aside class="notes">Experimento con k6: mismos escenarios y misma carga contra ambas arquitecturas, tokens JWT reales y datos sintéticos. Ambos stacks se desplegaron en local sobre el mismo hardware con idéntica asignación de CPU y memoria, así que la comparación es término a término en igualdad de recursos; la limitación declarada es que los valores absolutos corresponden a un entorno controlado, no a producción.</aside>
   </section>
 
   <!-- 30 · SIMULACIÓN DE CAOS -->
@@ -1153,11 +1153,11 @@ body.anno-review-open .anno-review-close{ display: block; }
       <ul class="x" style="font-size:21px">
         <li>El ciclo de monitoreo de PAIMA (<b>5 min</b>) acota el tiempo de detección de una incidencia</li>
         <li>La calidad del diagnóstico <b>depende del proveedor de IA</b>: remoto razona mejor; local/fallback es más simple</li>
-        <li>El benchmark es <b>acotado</b>: el monolito en producción no podía someterse a carga sin afectar usuarios</li>
+        <li>El benchmark se ejecutó en <b>ambiente local controlado</b> (idénticos recursos para ambas arquitecturas): los valores absolutos no representan producción</li>
         <li>Frontend sobre <b>Vue 2</b> (fin de vida); validación en Docker Compose local con datos anonimizados</li>
       </ul>
     </div>
-    <aside class="notes">Declaro las limitaciones antes de que me las pregunten: la periodicidad del ciclo, la dependencia del proveedor de IA, el benchmark acotado por la imposibilidad de cargar el sistema en producción, y la validación en entorno local. Ninguna invalida los resultados; delimitan su alcance.</aside>
+    <aside class="notes">Declaro las limitaciones antes de que me las pregunten: la periodicidad del ciclo, la dependencia del proveedor de IA, el benchmark ejecutado en entorno local controlado —aunque con idénticos recursos para ambas arquitecturas, lo que sí garantiza la comparación término a término—, y la validación con datos anonimizados. Ninguna invalida los resultados; delimitan su alcance.</aside>
   </section>
 
   <!-- 37 · TRABAJO FUTURO -->
