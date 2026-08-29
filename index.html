@@ -306,6 +306,76 @@ body.print-view .fragment{ opacity: 1 !important; transform: none !important; }
 body.print-view .hud, body.print-view .notes-panel{ display: none !important; }
 
 /* --------------------------------------------------------------- impresión */
+/* ------------------------------------------------- anotaciones (Supabase) */
+.anno-fab{
+  position: fixed; right: 18px; bottom: 46px; z-index: 50;
+  width: 48px; height: 48px; border-radius: 50%; border: none; cursor: pointer;
+  background: var(--accent); color: #fff; font-size: 20px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.35); display: grid; place-items: center;
+}
+.anno-fab:hover{ filter: brightness(1.12); }
+.anno-fab .badge[hidden]{ display: none; }
+.anno-fab .badge{
+  position: absolute; top: -5px; right: -5px; min-width: 20px; height: 20px;
+  border-radius: 999px; background: var(--accent-2); color: var(--ink);
+  font-size: 11px; font-weight: 800; display: grid; place-items: center; padding: 0 5px;
+}
+.anno-panel{
+  position: fixed; top: 0; right: 0; bottom: 0; width: 360px; z-index: 60;
+  background: #fff; color: var(--ink); box-shadow: -8px 0 30px rgba(0,0,0,.3);
+  display: flex; flex-direction: column;
+  transform: translateX(103%); transition: transform .22s;
+}
+body.anno-open .anno-panel{ transform: none; }
+.anno-panel header{
+  padding: 15px 18px; border-bottom: 1px solid var(--line);
+  display: flex; justify-content: space-between; align-items: center; gap: 10px;
+}
+.anno-panel header b{ color: var(--accent); font-size: 15.5px; }
+.anno-panel header button{ border: none; background: none; font-size: 19px; cursor: pointer; color: var(--muted); }
+.anno-list{ flex: 1; overflow: auto; padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+.anno-item{ background: var(--soft); border-radius: 10px; padding: 10px 12px; font-size: 14px; line-height: 1.45; }
+.anno-item .meta{ font-size: 11.5px; color: var(--muted); margin-top: 6px; }
+.anno-empty{ color: var(--muted); font-size: 14px; text-align: center; margin-top: 26px; line-height: 1.6; }
+.anno-form{ border-top: 1px solid var(--line); padding: 13px 18px; display: flex; flex-direction: column; gap: 8px; }
+.anno-form input, .anno-form textarea{
+  font: 14px var(--font); padding: 9px 11px;
+  border: 1px solid var(--line); border-radius: 8px; width: 100%;
+}
+.anno-form textarea{ min-height: 82px; resize: vertical; }
+.anno-form button{
+  background: var(--accent); color: #fff; border: none; border-radius: 8px;
+  padding: 10px; font: 600 14px var(--font); cursor: pointer;
+}
+.anno-form button:disabled{ opacity: .55; cursor: default; }
+.anno-toast{
+  position: fixed; bottom: 24px; left: 50%; transform: translate(-50%, 220%); z-index: 70;
+  background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 14px;
+  transition: transform .25s;
+}
+.anno-toast.show{ transform: translate(-50%, 0); }
+.anno-review{
+  position: fixed; inset: 0; z-index: 80; background: #fff; color: var(--ink);
+  overflow: auto; padding: 42px 9%; display: none;
+}
+body.anno-review-open .anno-review{ display: block; }
+.anno-review h1{ font-size: 28px; margin: 0 0 4px; }
+.anno-review .sub{ color: var(--muted); margin-bottom: 26px; font-size: 15px; }
+.anno-group{ margin-bottom: 28px; }
+.anno-group h2{ font-size: 18px; color: var(--accent); margin: 0 0 10px; display: flex; gap: 12px; align-items: center; }
+.anno-group h2 button{
+  font-size: 12.5px; padding: 4px 13px; border-radius: 999px;
+  border: 1px solid var(--accent); background: none; color: var(--accent); cursor: pointer;
+}
+.anno-group .anno-item{ margin-bottom: 8px; }
+.anno-review-close{
+  position: fixed; top: 18px; right: 24px; z-index: 81; border: none;
+  background: var(--ink); color: #fff; border-radius: 999px; padding: 9px 18px;
+  font: 600 14px var(--font); cursor: pointer; display: none;
+}
+body.anno-review-open .anno-review-close{ display: block; }
+@media print{ .anno-fab, .anno-panel, .anno-review, .anno-review-close, .anno-toast{ display: none !important; } }
+
 @page{ size: 1280px 720px; margin: 0; }
 @media print{
   html, body{ background: #fff !important; }
@@ -1172,6 +1242,7 @@ body.print-view .hud, body.print-view .notes-panel{ display: none !important; }
       f = fr.length;
     }
     updateHud();
+    if (window.__deckHook) window.__deckHook(i);
   }
 
   function next() {
@@ -1196,6 +1267,7 @@ body.print-view .hud, body.print-view .notes-panel{ display: none !important; }
 
   document.addEventListener("keydown", function (e) {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName || "")) return;
     switch (e.key) {
       case "ArrowRight": case " ": case "PageDown":
         e.preventDefault();
@@ -1238,10 +1310,177 @@ body.print-view .hud, body.print-view .notes-panel{ display: none !important; }
   if (m && history.replaceState) history.replaceState(null, "", location.pathname + location.search);
   fit();
 
+  // Hooks para módulos externos (p. ej. anotaciones)
+  window.__deckCurrent = function () { return i; };
+  window.__deckGo = function (n) { show(n); };
+
   // ?print → vista apilada para revisar todas las láminas en pantalla
   if (new URLSearchParams(location.search).has("print")) {
     body.classList.add("print-view");
   }
+})();
+</script>
+<button class="anno-fab" id="annoFab" title="Anotaciones">💬<span class="badge" id="annoBadge" hidden>0</span></button>
+<aside class="anno-panel" id="annoPanel" aria-label="Anotaciones">
+  <header><b id="annoTitle">Anotaciones</b><button id="annoClose" title="Cerrar">✕</button></header>
+  <div class="anno-list" id="annoList"></div>
+  <form class="anno-form" id="annoForm">
+    <input id="annoAutor" placeholder="Tu nombre (opcional)">
+    <textarea id="annoTexto" placeholder="Escribe tu anotación sobre esta lámina…" required></textarea>
+    <button type="submit" id="annoSend">Guardar anotación</button>
+  </form>
+</aside>
+<div class="anno-toast" id="annoToast"></div>
+<div class="anno-review" id="annoReview"></div>
+<button class="anno-review-close" id="annoReviewClose">✕ Cerrar anotaciones</button>
+
+<script>
+/* ==========================================================================
+   Anotaciones por lámina (Supabase) — el tutor comenta, el autor revisa
+   ========================================================================== */
+(function () {
+  "use strict";
+  var SUPA_URL = "https://ljysdavwyopntpfggbni.supabase.co";
+  var SUPA_KEY = "sb_publishable_pxu8kh7ZljQ10ojPE3GTkA_wY4fZt0o";
+  var HEADERS = {
+    "apikey": SUPA_KEY,
+    "Authorization": "Bearer " + SUPA_KEY,
+    "Content-Type": "application/json",
+    "Prefer": "return=minimal"
+  };
+
+  var body = document.body;
+  var fab = document.getElementById("annoFab");
+  var badge = document.getElementById("annoBadge");
+  var panel = document.getElementById("annoPanel");
+  var title = document.getElementById("annoTitle");
+  var list = document.getElementById("annoList");
+  var form = document.getElementById("annoForm");
+  var autor = document.getElementById("annoAutor");
+  var texto = document.getElementById("annoTexto");
+  var send = document.getElementById("annoSend");
+  var toast = document.getElementById("annoToast");
+  var review = document.getElementById("annoReview");
+  var data = [];
+
+  function currentSlide() {
+    return (window.__deckCurrent ? window.__deckCurrent() : 0) + 1;
+  }
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
+  function fmt(ts) {
+    return new Date(ts).toLocaleString("es-VE", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+  }
+  function itemHtml(a) {
+    return '<div class="anno-item">' + esc(a.texto) +
+      '<div class="meta">' + esc(a.autor || "Tutor") + " · " + fmt(a.created_at) + "</div></div>";
+  }
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add("show");
+    setTimeout(function () { toast.classList.remove("show"); }, 2400);
+  }
+  function forSlide(n) {
+    return data.filter(function (a) { return a.lamina === n; });
+  }
+  function updateBadge() {
+    var n = forSlide(currentSlide()).length;
+    badge.hidden = n === 0;
+    badge.textContent = n;
+  }
+  function renderList() {
+    var n = currentSlide();
+    title.textContent = "Anotaciones · Lámina " + n;
+    var items = forSlide(n);
+    list.innerHTML = items.length
+      ? items.map(itemHtml).join("")
+      : '<div class="anno-empty">Sin anotaciones en esta lámina.<br>Sé la primera persona en dejar una 💬</div>';
+  }
+  function load() {
+    return fetch(SUPA_URL + "/rest/v1/anotaciones?select=lamina,autor,texto,created_at&order=created_at.asc", { headers: HEADERS })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (rows) {
+        data = rows;
+        updateBadge();
+        if (body.classList.contains("anno-open")) renderList();
+        if (body.classList.contains("anno-review-open")) renderReview();
+      })
+      .catch(function () { /* silencioso: la presentación no depende de esto */ });
+  }
+
+  fab.addEventListener("click", function () {
+    body.classList.add("anno-open");
+    renderList();
+    load();
+  });
+  document.getElementById("annoClose").addEventListener("click", function () {
+    body.classList.remove("anno-open");
+  });
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var t = texto.value.trim();
+    if (!t) return;
+    send.disabled = true;
+    fetch(SUPA_URL + "/rest/v1/anotaciones", {
+      method: "POST",
+      headers: HEADERS,
+      body: JSON.stringify({ lamina: currentSlide(), autor: autor.value.trim() || "Tutor", texto: t })
+    })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); })
+      .then(function () {
+        texto.value = "";
+        showToast("Anotación guardada ✓");
+        return load();
+      })
+      .catch(function () { showToast("No se pudo guardar — intenta de nuevo"); })
+      .finally(function () { send.disabled = false; });
+  });
+
+  // Hook del visor: al cambiar de lámina, refrescar badge y panel
+  window.__deckHook = function () {
+    updateBadge();
+    if (body.classList.contains("anno-open")) renderList();
+  };
+
+  // ------------------------------------------------------- modo revisión
+  function renderReview() {
+    var groups = {};
+    data.forEach(function (a) { (groups[a.lamina] = groups[a.lamina] || []).push(a); });
+    var keys = Object.keys(groups).sort(function (a, b) { return a - b; });
+    review.innerHTML =
+      "<h1>Anotaciones recibidas</h1>" +
+      '<div class="sub">' + data.length + " en total · agrupadas por lámina</div>" +
+      (keys.length ? keys.map(function (k) {
+        return '<div class="anno-group"><h2>Lámina ' + k +
+          ' <button data-go="' + k + '">Ir a la lámina →</button></h2>' +
+          groups[k].map(itemHtml).join("") + "</div>";
+      }).join("") : '<div class="sub">Aún no hay anotaciones.</div>');
+    Array.prototype.forEach.call(review.querySelectorAll("[data-go]"), function (btn) {
+      btn.addEventListener("click", function () {
+        body.classList.remove("anno-review-open");
+        if (window.__deckGo) window.__deckGo(parseInt(btn.getAttribute("data-go"), 10) - 1);
+      });
+    });
+  }
+  document.getElementById("annoReviewClose").addEventListener("click", function () {
+    body.classList.remove("anno-review-open");
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    if (body.classList.contains("anno-review-open")) body.classList.remove("anno-review-open");
+    else if (body.classList.contains("anno-open")) body.classList.remove("anno-open");
+  });
+
+  // ?anotaciones → modo revisión para el autor
+  if (new URLSearchParams(location.search).has("anotaciones")) {
+    body.classList.add("anno-review-open");
+  }
+  load();
 })();
 </script>
 </body>
