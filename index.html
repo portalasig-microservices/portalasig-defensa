@@ -137,6 +137,7 @@ figcaption{ font-size: 15px; color: var(--muted); text-align: center; }
 .media{ display: grid; grid-template-columns: 1.05fr .95fr; gap: 40px; flex: 1; align-items: center; min-height: 0; }
 .media.media-left{ grid-template-columns: .95fr 1.05fr; }
 .media.media-left > .txt{ order: 2; }
+.media .figure img{ max-height: 430px; width: auto; }
 
 /* ------------------------------------------------------------------- código */
 pre.code{
@@ -1171,7 +1172,6 @@ body.print-view .hud, body.print-view .notes-panel{ display: none !important; }
       f = fr.length;
     }
     updateHud();
-    if (history.replaceState) history.replaceState(null, "", "#/" + (i + 1));
   }
 
   function next() {
@@ -1232,9 +1232,10 @@ body.print-view .hud, body.print-view .notes-panel{ display: none !important; }
   });
   window.addEventListener("afterprint", fit);
 
-  // Estado inicial: #/N en la URL, o 1
+  // Estado inicial: #/N en la URL (ancla manual), o 1; la URL permanece limpia
   var m = (location.hash || "").match(/^#\/(\d+)$/);
   show(m ? parseInt(m[1], 10) - 1 : 0);
+  if (m && history.replaceState) history.replaceState(null, "", location.pathname + location.search);
   fit();
 
   // ?print → vista apilada para revisar todas las láminas en pantalla
