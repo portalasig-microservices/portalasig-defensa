@@ -1,0 +1,1247 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Defensa TEG — PortalAsig: Microservicios + Mantenimiento asistido por IA</title>
+<style>
+/* ==========================================================================
+   PORTALASIG SLIDES — framework de presentaciones HTML estático
+   · 1 solo archivo, sin dependencias, offline
+   · Láminas 1280×720 (16:9), escalado automático a la ventana
+   · Exportable a PDF desde el navegador (cada lámina = 1 página)
+   · Tema editable vía variables CSS (abajo)
+   ========================================================================== */
+:root{
+  --w: 1280px;
+  --h: 720px;
+
+  /* ---- Paleta: inspirada en PortalAsig FE (Bootstrap Yeti) ---- */
+  --bg:        #ffffff;
+  --ink:       #222222;
+  --muted:     #6f7b84;
+  --accent:    #008cba;  /* primario Yeti */
+  --accent-2:  #e99002;  /* naranja warning Yeti */
+  --soft:      #ecf5f9;
+  --line:      #d8ecf2;
+  --good:      #43ac6a;  /* success Yeti */
+  --bad:       #f04124;  /* danger Yeti */
+  --code-bg:   #1c2b33;
+  --code-ink:  #d8ecf2;
+
+  --font: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Cascadia Code", "JetBrains Mono", Consolas, "Courier New", monospace;
+
+  --pad: 64px;
+  --pad-top: 48px;
+  --radius: 14px;
+}
+
+*{ box-sizing: border-box; }
+html, body{ height: 100%; }
+body{
+  margin: 0;
+  font-family: var(--font);
+  color: var(--ink);
+  background: #0d1219;               /* telón de fondo en modo pantalla */
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------------------ lámina */
+.slide{
+  display: none;
+  width: var(--w);
+  height: var(--h);
+  padding: var(--pad-top) var(--pad);
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+  flex-direction: column;
+  box-shadow: 0 18px 60px rgba(0,0,0,.5);
+}
+.slide.is-active{ display: flex; }
+
+/* Encabezado estándar de lámina de contenido */
+.slide__head{ margin-bottom: 24px; flex: none; }
+.slide__head h2{ font-size: 40px; margin: 6px 0 0; letter-spacing: -.01em; line-height: 1.12; }
+.slide__head::after{
+  content: ""; display: block; height: 4px; width: 84px;
+  background: var(--accent); border-radius: 2px; margin-top: 14px;
+}
+.slide__body{ flex: 1; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
+
+.kicker{
+  text-transform: uppercase; letter-spacing: .14em;
+  font-size: 14px; font-weight: 700; color: var(--accent);
+}
+.lead{ font-size: 24px; line-height: 1.45; color: var(--ink); margin: 0; }
+.muted{ color: var(--muted); }
+.small{ font-size: 16px; }
+.accent{ color: var(--accent); }
+.center{ flex: 1; display: grid; place-items: center; }
+
+/* ------------------------------------------------------------------ listas */
+ul.bullets{ font-size: 24px; line-height: 1.45; margin: 0; padding-left: 1.2em; }
+ul.bullets li{ margin: 10px 0; }
+ul.bullets li::marker{ color: var(--accent); }
+ul.bullets ul{ font-size: 20px; color: var(--muted); margin-top: 8px; }
+
+ul.check, ul.x, ul.arrow{ list-style: none; padding: 0; margin: 0; font-size: 22px; line-height: 1.4; }
+ul.check li, ul.x li, ul.arrow li{ position: relative; padding-left: 36px; margin: 12px 0; }
+ul.check li::before{ content: "✓"; position: absolute; left: 0; color: var(--good); font-weight: 800; }
+ul.x li::before{ content: "✗"; position: absolute; left: 0; color: var(--bad); font-weight: 800; }
+ul.arrow li::before{ content: "→"; position: absolute; left: 0; color: var(--accent); font-weight: 800; }
+
+/* --------------------------------------------------------------- columnas */
+.cols{ display: grid; grid-template-columns: 1fr 1fr; gap: 36px; flex: 1; min-height: 0; align-content: start; }
+.cols.cols-3{ grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+.cols > *{ min-width: 0; }
+
+/* ---------------------------------------------------------------- tarjetas */
+.card{
+  background: var(--bg); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 22px 24px;
+}
+.card h3{ margin: 0 0 10px; font-size: 22px; color: var(--accent); }
+.card p{ margin: 0; font-size: 18px; line-height: 1.45; color: var(--muted); }
+.card--soft{ background: var(--soft); border-color: transparent; }
+.card--good{ border-top: 5px solid var(--good); }
+.card--good h3{ color: var(--good); }
+.card--bad{ border-top: 5px solid var(--bad); }
+.card--bad h3{ color: var(--bad); }
+
+.tag, .chip{
+  display: inline-block; background: var(--soft); border: 1px solid var(--line);
+  color: var(--muted); border-radius: 999px; padding: 5px 14px;
+  font-size: 15px; font-weight: 600;
+}
+kbd{
+  background: var(--ink); color: #fff; border-radius: 6px;
+  padding: 3px 11px; font-family: var(--font-mono); font-size: .82em;
+}
+
+/* ----------------------------------------------------------------- figuras */
+.figure{
+  background: var(--soft); border: 1.5px dashed var(--line);
+  border-radius: var(--radius); display: grid; place-items: center;
+  color: var(--muted); font-size: 17px; text-align: center;
+  min-height: 300px; padding: 18px;
+}
+.figure img{ max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+figure{ margin: 0; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+figcaption{ font-size: 15px; color: var(--muted); text-align: center; }
+
+.media{ display: grid; grid-template-columns: 1.05fr .95fr; gap: 40px; flex: 1; align-items: center; min-height: 0; }
+.media.media-left{ grid-template-columns: .95fr 1.05fr; }
+.media.media-left > .txt{ order: 2; }
+
+/* ------------------------------------------------------------------- código */
+pre.code{
+  margin: 0; flex: 1; overflow: auto;
+  background: var(--code-bg); color: var(--code-ink);
+  border-radius: 12px; padding: 22px 26px;
+  font-family: var(--font-mono); font-size: 18px; line-height: 1.55;
+}
+code.ic{
+  background: var(--soft); border: 1px solid var(--line); border-radius: 6px;
+  padding: 1px 8px; font-family: var(--font-mono); font-size: .85em; color: var(--accent);
+}
+
+/* ------------------------------------------------------------------- tablas */
+table.tbl{ width: 100%; border-collapse: collapse; font-size: 20px; }
+table.tbl th{
+  background: var(--accent); color: #fff; text-align: left;
+  padding: 12px 16px; font-size: 18px;
+}
+table.tbl td{ padding: 12px 16px; border-bottom: 1px solid var(--line); }
+table.tbl tr:nth-child(even) td{ background: var(--soft); }
+
+/* --------------------------------------------------------------- fragments */
+.fragment{ opacity: 0; transform: translateY(10px); transition: opacity .25s, transform .25s; }
+.fragment.is-in{ opacity: 1; transform: none; }
+aside.notes{ display: none; }
+
+/* ============================================================ L A Y O U T S */
+
+/* 1 · Portada */
+.slide--title{ justify-content: center; }
+.slide--title::before{
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 16px;
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+}
+.slide--title h1{ font-size: 56px; line-height: 1.08; margin: 16px 0 12px; letter-spacing: -.015em; max-width: 1000px; }
+.slide--title .subtitle{ font-size: 26px; color: var(--muted); max-width: 940px; line-height: 1.35; margin: 0; }
+.slide--title .meta{ margin-top: 54px; display: flex; gap: 52px; font-size: 17px; }
+.slide--title .meta b{
+  display: block; color: var(--accent); text-transform: uppercase;
+  font-size: 12.5px; letter-spacing: .12em; margin-bottom: 6px;
+}
+.logo-slot{
+  position: absolute; top: 44px; right: 56px; width: 116px; height: 116px;
+  border: 1.5px dashed var(--line); border-radius: 12px;
+  display: grid; place-items: center; color: var(--muted); font-size: 13px;
+}
+
+/* 2 · Separador de sección */
+.slide--section{
+  justify-content: center; color: #fff;
+  background: linear-gradient(135deg, var(--accent), #045e77);
+}
+.slide--section .kicker{ color: var(--accent-2); }
+.slide--section .num{ font-size: 150px; font-weight: 800; line-height: .95; opacity: .22; }
+.slide--section h2{ font-size: 52px; margin: 10px 0 0; letter-spacing: -.01em; }
+.slide--section p{ font-size: 22px; opacity: .8; max-width: 900px; }
+
+/* 3 · Agenda */
+ol.agenda{ list-style: none; padding: 0; margin: 0; counter-reset: item; font-size: 25px; }
+ol.agenda li{
+  counter-increment: item; display: flex; gap: 20px; align-items: baseline;
+  padding: 15px 4px; border-bottom: 1px solid var(--line);
+}
+ol.agenda li::before{
+  content: counter(item, decimal-leading-zero);
+  color: var(--accent); font-weight: 800; font-size: 19px;
+}
+
+/* 4 · Cita */
+.slide--quote{ justify-content: center; }
+.slide--quote blockquote{ font-size: 38px; line-height: 1.35; font-weight: 550; margin: 0; max-width: 1020px; }
+.slide--quote blockquote::before{
+  content: "\201C"; display: block; font-size: 110px; line-height: .35;
+  color: var(--accent); margin-bottom: 22px; font-family: Georgia, serif;
+}
+.slide--quote .attrib{ margin-top: 28px; color: var(--muted); font-size: 19px; }
+
+/* 5 · KPIs / estadísticas */
+.kpis{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+.kpis.kpis-3{ grid-template-columns: repeat(3, 1fr); }
+.kpi{ background: var(--soft); border-radius: var(--radius); padding: 26px 20px; text-align: center; }
+.kpi b{ display: block; font-size: 52px; color: var(--accent); letter-spacing: -.02em; }
+.kpi span{ font-size: 17px; color: var(--muted); }
+
+/* 6 · Comparación VS */
+.vs{ display: grid; grid-template-columns: 1fr auto 1fr; gap: 22px; flex: 1; align-items: stretch; min-height: 0; }
+.vs__badge{
+  align-self: center; width: 64px; height: 64px; border-radius: 50%;
+  background: var(--accent-2); color: var(--ink);
+  display: grid; place-items: center; font-weight: 800; font-size: 20px;
+}
+
+/* 7 · Línea de tiempo */
+.timeline{ display: flex; gap: 28px; margin-top: 74px; flex: 1; align-content: flex-start; }
+.tl-item{ flex: 1; position: relative; padding-top: 32px; }
+.tl-item::before{
+  content: ""; position: absolute; top: 0; left: 0; width: 16px; height: 16px;
+  border-radius: 50%; background: var(--accent); border: 3px solid var(--soft);
+}
+.tl-item::after{
+  content: ""; position: absolute; top: 8px; left: 20px; right: -30px; height: 2px;
+  background: var(--line);
+}
+.tl-item:last-child::after{ display: none; }
+.tl-year{ font-size: 21px; font-weight: 800; color: var(--accent); }
+.tl-item p{ font-size: 17px; color: var(--muted); margin: 8px 0 0; line-height: 1.4; }
+
+/* 8 · Imagen a pantalla completa */
+.slide--image-full{ padding: 0; }
+.slide--image-full .bg{
+  position: absolute; inset: 0; background-size: cover; background-position: center;
+  background: linear-gradient(135deg, #03414f, #008cba 55%, #e99002 130%);
+}
+.slide--image-full .scrim{
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 35%, rgba(9,15,23,.9));
+}
+.slide--image-full .caption{ position: absolute; left: var(--pad); right: var(--pad); bottom: 46px; color: #fff; }
+.slide--image-full .caption h2{ font-size: 40px; margin: 0 0 8px; }
+.slide--image-full .caption p{ font-size: 20px; margin: 0; opacity: .85; }
+
+/* 9 · Cierre */
+.slide--closing{
+  justify-content: center; color: #fff;
+  background: linear-gradient(135deg, var(--accent), #045e77);
+}
+.slide--closing h2{ font-size: 66px; margin: 0 0 10px; letter-spacing: -.015em; }
+.slide--closing .sub{ font-size: 26px; opacity: .85; margin: 0 0 40px; }
+.slide--closing .row{ display: flex; gap: 14px; flex-wrap: wrap; }
+.slide--closing .chip{ background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.25); color: #fff; font-size: 17px; }
+
+/* --------------------------------------------------------------- HUD (UI) */
+.hud__bar{ position: fixed; top: 0; left: 0; height: 4px; background: var(--accent); width: 0; z-index: 30; transition: width .2s; }
+.hud__foot, .hud__count{
+  position: fixed; bottom: 12px; z-index: 30;
+  color: #fff; opacity: .55; font-size: 13px; letter-spacing: .04em;
+}
+.hud__foot{ left: 18px; }
+.hud__count{ right: 18px; font-variant-numeric: tabular-nums; }
+
+.notes-panel{
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+  background: rgba(13,18,25,.96); color: #e5e7eb;
+  padding: 16px 24px; font-size: 16px; line-height: 1.5;
+  border-top: 2px solid var(--accent);
+  transform: translateY(102%); transition: transform .2s;
+  max-height: 34vh; overflow: auto;
+}
+body.show-notes .notes-panel{ transform: none; }
+
+/* ------------------------------------------------------------- vista índice */
+body.overview{ display: block; overflow: auto; }
+body.overview #deck{
+  display: grid; grid-template-columns: repeat(4, auto);
+  gap: 18px; padding: 26px; justify-content: center;
+}
+body.overview .slide{ display: flex !important; cursor: pointer; box-shadow: 0 4px 18px rgba(0,0,0,.4); }
+body.overview .slide.is-active{ outline: 3px solid var(--accent-2); }
+body.overview .fragment{ opacity: 1 !important; transform: none !important; }
+
+/* Vista de impresión en pantalla (?print) */
+body.print-view{ display: block; overflow: auto; background: #666; }
+body.print-view .slide{ display: flex !important; zoom: 1 !important; box-shadow: none; margin: 10px auto; }
+body.print-view .fragment{ opacity: 1 !important; transform: none !important; }
+body.print-view .hud, body.print-view .notes-panel{ display: none !important; }
+
+/* --------------------------------------------------------------- impresión */
+@page{ size: 1280px 720px; margin: 0; }
+@media print{
+  html, body{ background: #fff !important; }
+  body{ display: block; overflow: visible; }
+  #deck{ display: block !important; }
+  .slide{
+    display: flex !important; zoom: 1 !important;
+    box-shadow: none; margin: 0;
+    page-break-after: always; break-after: page;
+  }
+  .slide:last-child{ page-break-after: auto; break-after: auto; }
+  .hud, .notes-panel{ display: none !important; }
+  .fragment{ opacity: 1 !important; transform: none !important; }
+  *{ -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body data-footer="PortalAsig · Microservicios + IA — Defensa TEG">
+<main id="deck">
+
+  <!-- 1 · PORTADA -->
+  <section class="slide slide--title">
+    <div class="logo-slot" style="border:none">
+      <img src="img/ucv-logo.png" alt="UCV" style="max-width:100%; max-height:100%; object-fit:contain">
+    </div>
+    <p class="kicker">Universidad Central de Venezuela · Facultad de Ciencias · Escuela de Computación</p>
+    <h1 style="font-size:37px">Diseño e implementación de un modelo de mantenimiento asistido por inteligencia artificial para una arquitectura de microservicios en el sistema PortalAsig</h1>
+    <p class="subtitle">Trabajo Especial de Grado</p>
+    <div class="meta">
+      <div><b>Autor</b>Br. Frank Ángel Ponte Delgado</div>
+      <div><b>Tutor</b>Prof. Walter Hernández</div>
+      <div><b>Fecha</b>Caracas, 2026</div>
+    </div>
+    <aside class="notes">Buenos días. Agradezco al jurado su tiempo. Voy a presentar el trabajo: un modelo de mantenimiento asistido por IA sobre una arquitectura de microservicios para PortalAsig, el portal académico de la Facultad de Ciencias.</aside>
+  </section>
+
+  <!-- 2 · AGENDA -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Agenda</p>
+      <h2>Contenido de la presentación</h2>
+    </div>
+    <div class="slide__body">
+      <ol class="agenda">
+        <li>Contexto y planteamiento del problema</li>
+        <li>Objetivos del trabajo</li>
+        <li>Marco conceptual (síntesis)</li>
+        <li>Solución: microservicios, frontend y PAIMA</li>
+        <li>Validación y resultados</li>
+        <li>Conclusiones, limitaciones y trabajo futuro</li>
+      </ol>
+    </div>
+    <aside class="notes">Presento la ruta: del problema a la solución y sus pruebas. Iré directo a lo que hice y lo que demostré; el marco teórico lo sintetizo porque ya está en el documento.</aside>
+  </section>
+
+  <!-- 3 · GANCHO -->
+  <section class="slide slide--quote">
+    <blockquote>
+      Los colaboradores que mantienen PortalAsig permanecen en el proyecto entre uno y dos semestres. Cada vez que uno se va, el conocimiento se va con él.
+    </blockquote>
+    <p class="attrib">— El problema que motiva este trabajo</p>
+    <aside class="notes">Antes de hablar de tecnología, quiero que retengan esto: PortalAsig lo mantienen estudiantes de TEG, seminario o servicio comunitario, que rotan cada uno o dos semestres. Todo el diseño que verán responde a esa realidad humana, no solo a una moda técnica.</aside>
+  </section>
+
+  <!-- 4 · SECCIÓN 01 -->
+  <section class="slide slide--section">
+    <p class="kicker">Sección</p>
+    <div class="num">01</div>
+    <h2>Contexto y problema</h2>
+    <p>Un sistema crítico para la Facultad, con un backend estancado y un modelo de mantenimiento insostenible.</p>
+  </section>
+
+  <!-- 5 · HISTORIA (TIMELINE) -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Contexto</p>
+      <h2>PortalAsig: una década de evolución</h2>
+    </div>
+    <div class="slide__body">
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-year">2016</div>
+          <p>PortalAsig 2: backend Node.js/Express monolítico, frontend AngularJS.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2020</div>
+          <p>Frontend migrado a Vue.js (TEG de Vásquez Balza). El backend queda intacto.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2020–2024</div>
+          <p>Seis años de cambios incrementales sobre el monolito, sin mantenimiento sistemático.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">Hoy</div>
+          <p>Este trabajo: rediseño del backend y autogestión del mantenimiento con IA.</p>
+        </div>
+      </div>
+    </div>
+    <aside class="notes">PortalAsig nació en 2016 como monolito Node. En 2020 se modernizó solo el frontend a Vue —ese TEG demostró que un rediseño bien planificado extiende la vida del sistema—. El backend quedó seis años acumulando deuda. Ahí entra este trabajo.</aside>
+  </section>
+
+  <!-- 6 · EL MONOLITO HOY -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Problema</p>
+      <h2>El backend monolítico hoy</h2>
+    </div>
+    <div class="slide__body">
+      <div class="media">
+        <div class="txt">
+          <ul class="bullets" style="font-size:22px">
+            <li>Un único proceso concentra <b>todos los dominios</b>: autenticación, sitios, evaluaciones, correos, foros…</li>
+            <li>Un controlador de <b class="accent">3.629 líneas</b> gestiona <b class="accent">18 dominios</b> de negocio</li>
+            <li>Sin pruebas automatizadas ni observabilidad</li>
+            <li>Despliegue manual, infraestructura <i>on-premise</i></li>
+          </ul>
+        </div>
+        <figure>
+          <div class="figure" style="min-height:340px"><img src="img/modelo-datos-monolito.png" alt="Modelo de datos del monolito"></div>
+          <figcaption>Fig. 1 · Modelo de datos del monolito: dominios acoplados referencialmente.</figcaption>
+        </figure>
+      </div>
+    </div>
+    <aside class="notes">El síntoma más claro: un solo controlador de 3.629 líneas atendiendo 18 dominios distintos. Cualquier cambio local puede romper funcionalidades aparentemente no relacionadas, y sin tests ni observabilidad cada modificación es un ejercicio de alto riesgo.</aside>
+  </section>
+
+  <!-- 7 · PROBLEMA HUMANO -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Problema</p>
+      <h2>…pero el problema de fondo es humano</h2>
+    </div>
+    <div class="slide__body">
+      <div class="cols cols-3">
+        <div class="card card--bad">
+          <h3>Deuda técnica</h3>
+          <p>Seis años de cambios sin proceso sistemático: código densificado, dominios acoplados, cero validación automatizada.</p>
+        </div>
+        <div class="card card--bad">
+          <h3>Conocimiento tácito</h3>
+          <p>Colaboradores temporales de 1–2 semestres, sin documentación exhaustiva ni transferencia formal: el saber se pierde en cada rotación.</p>
+        </div>
+        <div class="card card--bad">
+          <h3>Sin equipo DevOps</h3>
+          <p>Infraestructura on-premise y despliegue manual. Toda herramienta compleja se convierte en pasivo para el siguiente colaborador.</p>
+        </div>
+      </div>
+    </div>
+    <aside class="notes">Tres fuerzas se combinan: la deuda crece, el conocimiento se va con cada colaborador, y no hay equipo permanente de operaciones. Por eso la solución no puede ser solo "mover a microservicios": debe hacer el sistema mantenible por gente que llega en frío.</aside>
+  </section>
+
+  <!-- 8 · OBJETIVOS -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Objetivos</p>
+      <h2>Objetivo general y específicos</h2>
+    </div>
+    <div class="slide__body">
+      <div class="cols">
+        <div class="card card--soft">
+          <h3>Objetivo general</h3>
+          <p style="font-size:19px; color:var(--ink)">Diseñar e implementar una arquitectura de microservicios para el backend de PortalAsig, adaptar el frontend heredado como cliente de esa arquitectura distribuida e incorporar técnicas sistemáticas de mantenimiento asistidas por inteligencia artificial.</p>
+        </div>
+        <div>
+          <ul class="arrow" style="font-size:19px">
+            <li class="fragment">Documentar el estado actual y caracterizar sus dominios</li>
+            <li class="fragment">Diseñar la arquitectura de microservicios desacoplada</li>
+            <li class="fragment">Adaptar el frontend heredado como cliente distribuido</li>
+            <li class="fragment">Implementar aseguramiento sistemático de calidad</li>
+            <li class="fragment">Diseñar e implementar PAIMA: ciclo MAPE-K con IA</li>
+            <li class="fragment">Instrumentar observabilidad distribuida</li>
+            <li class="fragment">Evaluar el ecosistema con pruebas y experimentos</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <aside class="notes">El objetivo general tiene tres patas: migrar el backend, adaptar el frontend y sistematizar el mantenimiento con ayuda de IA. Los siete específicos —que iré revelando— cubren desde la documentación del sistema actual hasta la evaluación experimental.</aside>
+  </section>
+
+  <!-- 9 · LA RESPUESTA EN UNA LÁMINA -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Visión de la solución</p>
+      <h2>Tres líneas de transformación</h2>
+    </div>
+    <div class="slide__body">
+      <div class="cols cols-3">
+        <div class="card">
+          <h3>① Backend → Microservicios</h3>
+          <p>Dominios acotados UAA, Site y Notify; cada uno con su base de datos, su versionado y su despliegue autónomo.</p>
+        </div>
+        <div class="card">
+          <h3>② Frontend adaptado</h3>
+          <p>El cliente Vue.js heredado se reestructura para operar contra la arquitectura distribuida con OAuth2/JWT.</p>
+        </div>
+        <div class="card">
+          <h3>③ PAIMA</h3>
+          <p>Servicio de autogestión del mantenimiento: monitorea, diagnostica con IA y propone acciones. El humano aprueba.</p>
+        </div>
+      </div>
+      <p class="lead fragment" style="font-size:20px">Más una cuarta transversal: <b>técnicas sistemáticas de mantenimiento</b> (calidad, pruebas y observabilidad) sobre todo el ecosistema.</p>
+    </div>
+    <aside class="notes">Esta lámina es el mapa de toda la solución: backend descompuesto, frontend adaptado, y PAIMA como capa de autogestión. Transversal a todo: calidad y observabilidad sistemáticas. Ahora, tres conceptos del marco teórico y entro a la solución.</aside>
+  </section>
+
+  <!-- 10 · SECCIÓN 02 -->
+  <section class="slide slide--section">
+    <p class="kicker">Sección</p>
+    <div class="num">02</div>
+    <h2>Marco conceptual</h2>
+    <p>Tres ideas que sustentan el trabajo: microservicios, computación autonómica y el ciclo MAPE-K.</p>
+  </section>
+
+  <!-- 11 · MONOLITO VS MICROSERVICIOS -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Marco conceptual</p>
+      <h2>De monolito a microservicios</h2>
+    </div>
+    <div class="slide__body">
+      <div class="vs">
+        <div class="card card--bad">
+          <h3>Arquitectura monolítica</h3>
+          <ul class="x" style="font-size:19px">
+            <li>Un proceso y una base de datos para todo</li>
+            <li>Fallos sin aislamiento entre dominios</li>
+            <li>Despliegue acoplado: todo o nada</li>
+            <li>Escala el sistema completo, no lo que se necesita</li>
+          </ul>
+        </div>
+        <div class="vs__badge">VS</div>
+        <div class="card card--good">
+          <h3>Microservicios</h3>
+          <ul class="check" style="font-size:19px">
+            <li>Servicios autónomos por dominio de negocio</li>
+            <li>Aislamiento de fallos entre servicios</li>
+            <li>Despliegue y versionado independientes</li>
+            <li>Escalado selectivo por servicio</li>
+          </ul>
+        </div>
+      </div>
+      <p class="muted small">A cambio, introduce complejidad operativa: más procesos, más bases de datos, monitoreo distribuido. Esa complejidad es la que aborda PAIMA.</p>
+    </div>
+    <aside class="notes">La comparación clásica, pero enfatizo el costo: los microservicios no son gratis —multiplican procesos, bases de datos y puntos que vigilar—. Ese costo operativo es precisamente lo que motiva la segunda mitad del trabajo: la autogestión.</aside>
+  </section>
+
+  <!-- 12 · MAPE-K -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Marco conceptual</p>
+      <h2>Computación autonómica: el ciclo MAPE-K</h2>
+    </div>
+    <div class="slide__body">
+      <div class="cols cols-3">
+        <div class="card card--soft">
+          <h3>M · Monitor</h3>
+          <p>Recolecta métricas, logs y eventos del entorno gestionado.</p>
+        </div>
+        <div class="card card--soft">
+          <h3>A · Analyze</h3>
+          <p>Interpreta síntomas, detecta anomalías y las clasifica.</p>
+        </div>
+        <div class="card card--soft">
+          <h3>P · Plan</h3>
+          <p>Decide la acción de remediación a partir del diagnóstico.</p>
+        </div>
+        <div class="card card--soft">
+          <h3>E · Execute</h3>
+          <p>Aplica la acción sobre el sistema y verifica el resultado.</p>
+        </div>
+        <div class="card card--soft">
+          <h3>K · Knowledge</h3>
+          <p>Base de conocimiento que retroalimenta cada fase del ciclo.</p>
+        </div>
+        <div class="card">
+          <h3>+ IA</h3>
+          <p>Línea de investigación reciente: delegar Analyze y Plan en modelos de lenguaje. PAIMA implementa esta idea.</p>
+        </div>
+      </div>
+    </div>
+    <aside class="notes">MAPE-K es el ciclo de control estándar de la computación autonómica: monitorear, analizar, planificar, ejecutar, con conocimiento compartido. La tendencia actual —que sigo de Esposito et al.— es delegar el análisis y la planificación en IA. PAIMA es exactamente eso, aplicado a PortalAsig.</aside>
+  </section>
+
+  <!-- 13 · STACK TECNOLÓGICO -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Marco conceptual</p>
+      <h2>Stack tecnológico seleccionado</h2>
+    </div>
+    <div class="slide__body">
+      <table class="tbl" style="font-size:18px">
+        <tr><th>Categoría</th><th>Tecnologías</th><th>Rol en el ecosistema</th></tr>
+        <tr><td>Framework de microservicios</td><td>Spring Boot (Java)</td><td>Servicios UAA, Site, Notify y PAIMA</td></tr>
+        <tr><td>Persistencia</td><td>MySQL + Flyway</td><td>Una BD por servicio, esquema versionado</td></tr>
+        <tr><td>Calidad continua</td><td>Checkstyle · Testcontainers · JaCoCo · GitHub Actions</td><td>Validación automática en cada pull request</td></tr>
+        <tr><td>Observabilidad</td><td>Prometheus · Grafana · Loki</td><td>Métricas, tableros y agregación de logs</td></tr>
+        <tr><td>Pruebas</td><td>JUnit · Cypress · k6</td><td>Integración, end-to-end y carga</td></tr>
+        <tr><td>Inteligencia artificial</td><td>LLM local o remoto, configurable</td><td>Diagnóstico y planificación en PAIMA (con fallback determinista)</td></tr>
+        <tr><td>Infraestructura</td><td>Docker Compose · Nginx · Config Server</td><td>Orquestación local, proxy y configuración centralizada</td></tr>
+      </table>
+    </div>
+    <aside class="notes">Criterio rector: tecnologías maduras y con comunidad amplia, porque un colaborador temporal debe encontrar documentación y ejemplos sin fricción. Todo corre on-premise con Docker Compose; nada exige nube.</aside>
+  </section>
+
+  <!-- 14 · SECCIÓN 03 -->
+  <section class="slide slide--section">
+    <p class="kicker">Sección</p>
+    <div class="num">03</div>
+    <h2>Solución</h2>
+    <p>Microservicios + mantenimiento sistemático + autogestión con inteligencia artificial.</p>
+  </section>
+
+  <!-- 15 · ARQUITECTURA GENERAL -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Solución</p>
+      <h2>Arquitectura general del ecosistema</h2>
+    </div>
+    <div class="slide__body">
+      <figure style="flex:1; justify-content:center">
+        <div class="figure" style="height:440px; min-height:0; padding:8px"><img src="img/diagrama-arquitectura.png" alt="Arquitectura de microservicios" style="max-height:420px; width:auto"></div>
+        <figcaption>Fig. 2 · Vista general: proxy Nginx, Config Server, microservicios y stack de observabilidad.</figcaption>
+      </figure>
+    </div>
+    <aside class="notes">La lámina central de la defensa. A la izquierda, el frontend Vue habla con cada servicio a través del proxy Nginx. El Config Server centraliza la configuración. Cada microservicio tiene su base MySQL. Y todo el ecosistema reporta métricas y logs a Prometheus, Grafana y Loki —que es de donde se alimenta PAIMA.</aside>
+  </section>
+
+  <!-- 16 · BOUNDED CONTEXTS -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Solución</p>
+      <h2>Descomposición en dominios acotados</h2>
+    </div>
+    <div class="slide__body">
+      <div class="cols">
+        <div class="card">
+          <h3>UAA · Identidad y acceso</h3>
+          <p>Usuarios, roles y autenticación OAuth2/JWT con emisión y refresco de tokens.</p>
+        </div>
+        <div class="card">
+          <h3>Site · Núcleo académico</h3>
+          <p>Cursos, semestres, sitios académicos, secciones, horarios y evaluaciones.</p>
+        </div>
+        <div class="card">
+          <h3>Notify · Notificaciones</h3>
+          <p>Renderizado y despacho de correos electrónicos del ecosistema.</p>
+        </div>
+        <div class="card">
+          <h3>PAIMA · Autogestión</h3>
+          <p>Ciclo MAPE-K con IA: vigilancia, diagnóstico y remediación asistida.</p>
+        </div>
+      </div>
+      <p class="muted small">Transversales: <span class="tag">Commons · librería compartida</span> <span class="tag">Config Server · configuración centralizada</span></p>
+    </div>
+    <aside class="notes">Tres dominios de negocio —identidad, núcleo académico y notificaciones— más PAIMA como servicio de autogestión. La descomposición elimina el acoplamiento referencial del modelo monolítico: la caída de un servicio ya no compromete al resto.</aside>
+  </section>
+
+  <!-- 17 · DATOS POR SERVICIO -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Solución</p>
+      <h2>Database per service</h2>
+    </div>
+    <div class="slide__body">
+      <p class="lead" style="font-size:20px">Cada dominio <b>posee y versiona</b> su propio esquema MySQL: se elimina el acoplamiento por base de datos.</p>
+      <div class="cols">
+        <figure>
+          <div class="figure" style="min-height:330px"><img src="img/modelo-datos-monolito.png" alt="Modelo monolito"></div>
+          <figcaption>Antes · Esquema único, dominios acoplados</figcaption>
+        </figure>
+        <figure>
+          <div class="figure" style="min-height:330px"><img src="img/modelo-datos-distribuido.png" alt="Modelo distribuido"></div>
+          <figcaption>Después · Una base de datos por servicio</figcaption>
+        </figure>
+      </div>
+    </div>
+    <aside class="notes">A la izquierda, el esquema del monolito: tablas de todos los dominios entrelazadas. A la derecha, el modelo distribuido: UAA, Site y Notify poseen sus datos. Esto habilita despliegues y migraciones independientes por servicio.</aside>
+  </section>
+
+  <!-- 18 · MANTENIMIENTO SISTEMÁTICO -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Mantenimiento sistemático</p>
+      <h2>La calidad deja de depender del conocimiento tácito</h2>
+    </div>
+    <div class="slide__body">
+      <div class="media">
+        <div class="txt">
+          <ul class="bullets" style="font-size:21px">
+            <li>Pipeline en <b>cada pull request</b>: Checkstyle → pruebas de integración con <b>Testcontainers</b> (BD real) → cobertura <b>JaCoCo</b></li>
+            <li><b class="accent">Branch protection</b>: si un check falla, el merge queda bloqueado</li>
+            <li>Validación <b>sistemática y reproducible</b>, no manual ni dependiente de memoria</li>
+          </ul>
+        </div>
+        <figure>
+          <div class="figure" style="min-height:340px"><img src="img/github-pr-checks.png" alt="Checks en pull request"></div>
+          <figcaption>Fig. 3 · El PR no se fusiona hasta que el pipeline pasa.</figcaption>
+        </figure>
+      </div>
+    </div>
+    <aside class="notes">Esta es la técnica de mantenimiento más importante para el problema humano: la validación ya no vive en la cabeza de nadie. Cada pull request ejecuta estilo, pruebas contra bases de datos reales y cobertura; si algo falla, GitHub bloquea la fusión.</aside>
+  </section>
+
+  <!-- 19 · FLYWAY -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Mantenimiento sistemático</p>
+      <h2>Esquema versionado con Flyway</h2>
+    </div>
+    <div class="slide__body">
+      <div class="media media-left">
+        <div class="txt">
+          <ul class="bullets" style="font-size:21px">
+            <li>Migraciones SQL incrementales: <code class="ic">V{versión}__{descripción}.sql</code></li>
+            <li>El esquema se construye <b>progresivamente y de forma reproducible</b></li>
+            <li>Un colaborador nuevo levanta la base de datos <b>sin conocimiento tácito</b></li>
+          </ul>
+        </div>
+        <figure>
+          <div class="figure" style="min-height:340px"><img src="img/flyway-script-ejemplo.png" alt="Script Flyway"></div>
+          <figcaption>Fig. 4 · Extracto de la migración inicial del servicio Site.</figcaption>
+        </figure>
+      </div>
+    </div>
+    <aside class="notes">Las bases de datos también quedan bajo control de versiones: migraciones SQL incrementales con convención de nombres. El siguiente estudiante reconstruye cualquier esquema ejecutando las migraciones, sin preguntarle a nadie.</aside>
+  </section>
+
+  <!-- 20 · FRONTEND ADAPTADO -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Solución</p>
+      <h2>El frontend heredado se adapta, no se reescribe</h2>
+    </div>
+    <div class="slide__body">
+      <ul class="bullets">
+        <li class="fragment">Store <b>Vuex reestructurado en módulos por dominio</b>, alineados con los microservicios</li>
+        <li class="fragment">Guards de navegación con <b class="accent">7 niveles de permisos</b> (estudiante → administrador)</li>
+        <li class="fragment">Múltiples instancias <b>Axios</b> que reflejan la topología: UAA, Site, PAIMA</li>
+        <li class="fragment">Sesión en dos capas: <b>client_credentials</b> (aplicación) + login de usuario con <b>refresh token</b> en cookies</li>
+      </ul>
+      <p class="muted small">Se sigue el precedente del TEG de 2020: evolución controlada en lugar de reescritura completa.</p>
+    </div>
+    <aside class="notes">Del lado del cliente no se reescribió nada: se reestructuró. El store Vuex quedó por dominios, los guards manejan siete niveles de permiso y hay un cliente Axios por microservicio. La autenticación pasó de propietaria a OAuth2 estándar —siguiente lámina.</aside>
+  </section>
+
+  <!-- 21 · OAUTH2/JWT -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Solución</p>
+      <h2>Autenticación OAuth2/JWT de extremo a extremo</h2>
+    </div>
+    <div class="slide__body">
+      <div class="media">
+        <div class="txt">
+          <ul class="bullets" style="font-size:21px">
+            <li>Se reemplaza la autenticación propietaria por <b>OAuth2/JWT estándar</b></li>
+            <li>Token de aplicación (client_credentials) + token de usuario con refresh</li>
+            <li>CORS configurado por microservicio; flujo <b>validado E2E con Cypress</b></li>
+          </ul>
+        </div>
+        <figure>
+          <div class="figure" style="min-height:340px"><img src="img/cypress-oauth2-flow.png" alt="Flujo OAuth2"></div>
+          <figcaption>Fig. 5 · Flujo de autenticación validado de extremo a extremo.</figcaption>
+        </figure>
+      </div>
+    </div>
+    <aside class="notes">El servicio UAA emite tokens JWT: uno de aplicación para que el frontend exista como cliente, y uno de usuario con refresh tras el login. El flujo completo está cubierto por pruebas end-to-end.</aside>
+  </section>
+
+  <!-- 22 · PAIMA INTRO -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Solución · Autogestión</p>
+      <h2>PAIMA: PortalAsig Intelligent MAPE-K</h2>
+    </div>
+    <div class="slide__body">
+      <div class="media">
+        <div class="txt">
+          <ul class="bullets" style="font-size:21px">
+            <li>Se construye <b>sobre la observabilidad ya instalada</b>: Prometheus, Loki, Grafana</li>
+            <li>Las fases <b>Analyze y Plan se delegan a un LLM</b> — proveedor configurable con <b>fallback determinista</b></li>
+            <li><b class="accent">Human-in-the-loop</b>: el operador evalúa y aprueba cada acción antes de ejecutarse</li>
+          </ul>
+        </div>
+        <figure>
+          <div class="figure" style="min-height:340px"><img src="img/paima-clases.png" alt="Arquitectura interna PAIMA"></div>
+          <figcaption>Fig. 6 · Arquitectura interna de PAIMA.</figcaption>
+        </figure>
+      </div>
+    </div>
+    <aside class="notes">PAIMA es la contribución original del trabajo. No exige infraestructura nueva: consume lo que ya recolecta la observabilidad. La IA analiza y propone, pero hay dos salvaguardas: fallback determinista si el proveedor de IA no está disponible, y aprobación humana obligatoria.</aside>
+  </section>
+
+  <!-- 23 · PAIMA DASHBOARD -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Solución · Autogestión</p>
+      <h2>Operación pensada para quien llega “en frío”</h2>
+    </div>
+    <div class="slide__body">
+      <div class="media media-left">
+        <div class="txt">
+          <ul class="bullets" style="font-size:21px">
+            <li>Salud del ecosistema <b>en un vistazo</b>: servicios, incidentes activos, métricas</li>
+            <li>Logs y métricas <b>consolidados por servicio</b> en un solo panel</li>
+            <li>Reduce la curva de entrada de un <b>nuevo mantenedor</b></li>
+          </ul>
+        </div>
+        <figure>
+          <div class="figure" style="min-height:340px"><img src="img/paima-dashboard.png" alt="Dashboard PAIMA"></div>
+          <figcaption>Fig. 7 · Panel de gestión de PAIMA.</figcaption>
+        </figure>
+      </div>
+    </div>
+    <aside class="notes">El panel consolida lo esencial: qué servicios están sanos, qué incidentes hay abiertos y dónde mirar. Un estudiante que recibe el proyecto por primera vez puede orientarse sin una transferencia de conocimiento previa.</aside>
+  </section>
+
+  <!-- 24 · PAIMA IA + APROBACIÓN -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Solución · Autogestión</p>
+      <h2>IA que propone, humano que decide</h2>
+    </div>
+    <div class="slide__body">
+      <div class="media">
+        <div class="txt">
+          <ul class="bullets" style="font-size:21px">
+            <li>El operador <b>conversa con el asistente</b> sobre la incidencia detectada</li>
+            <li>La IA <b>clasifica, diagnostica y propone</b> la acción de remediación</li>
+            <li>Nada se ejecuta sin <b class="accent">aprobación explícita</b> del operador</li>
+          </ul>
+        </div>
+        <figure>
+          <div class="figure" style="min-height:340px"><img src="img/paima-chat.png" alt="Chat PAIMA"></div>
+          <figcaption>Fig. 8 · Asistente conversacional de diagnóstico.</figcaption>
+        </figure>
+      </div>
+    </div>
+    <aside class="notes">El flujo de trabajo con la IA es conversacional: el operador pregunta, la IA explica el diagnóstico y propone —por ejemplo, reiniciar un servicio— pero la ejecución requiere el clic de aprobación. La autonomía tiene supervisión.</aside>
+  </section>
+
+  <!-- 25 · SECCIÓN 04 -->
+  <section class="slide slide--section">
+    <p class="kicker">Sección</p>
+    <div class="num">04</div>
+    <h2>Validación y resultados</h2>
+    <p>Cuatro dimensiones de evaluación: integración, end-to-end, rendimiento y resiliencia.</p>
+  </section>
+
+  <!-- 26 · ESTRATEGIA -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Validación</p>
+      <h2>Estrategia de pruebas en cuatro dimensiones</h2>
+    </div>
+    <div class="slide__body">
+      <table class="tbl" style="font-size:18px">
+        <tr><th>Dimensión</th><th>Qué mide</th><th>Herramientas</th><th>Criterio</th></tr>
+        <tr><td>Integración</td><td>Cobertura de líneas y ramas</td><td>JaCoCo + GitHub Actions</td><td>Umbral 70% líneas / 60% ramas</td></tr>
+        <tr><td>End-to-end</td><td>Flujos completos de usuario</td><td>Cypress</td><td>Suite estable en verde</td></tr>
+        <tr><td>Rendimiento</td><td>Latencia p95/p99, throughput, errores</td><td>k6 + Prometheus</td><td>Comparativo frente al monolito</td></tr>
+        <tr><td>Resiliencia</td><td>Detección y recuperación de fallos</td><td>Simulación de caos + PAIMA</td><td>Recuperación asistida validada</td></tr>
+      </table>
+      <p class="muted small">Entorno: Docker Compose local, datos anonimizados, diseño experimental reproducible.</p>
+    </div>
+    <aside class="notes">La evaluación no fue una sola prueba: cuatro dimensiones con herramientas y criterios objetivos cada una. Las dos primeras miden calidad de código y de flujos; las dos últimas miden el comportamiento de la arquitectura bajo carga y bajo fallos.</aside>
+  </section>
+
+  <!-- 27 · COBERTURA -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Resultados · Integración</p>
+      <h2>Cobertura medida y exigida automáticamente</h2>
+    </div>
+    <div class="slide__body">
+      <div class="kpis">
+        <div class="kpi"><b>71–81%</b><span>líneas por microservicio</span></div>
+        <div class="kpi"><b>70 / 60</b><span>umbral líneas / ramas en cada PR</span></div>
+        <div class="kpi"><b>0%</b><span>cobertura del monolito legacy</span></div>
+        <div class="kpi"><b>4</b><span>pipelines con merge bloqueado</span></div>
+      </div>
+      <p class="lead fragment" style="font-size:21px">De <b>cero</b> a cobertura <b>medida y exigida</b> en cada cambio: la calidad se volvió sistemática.</p>
+    </div>
+    <aside class="notes">El contraste es cualitativo: el monolito no tenía ni una prueba; hoy cada servicio mide entre 71 y 81 por ciento de líneas, y si un PR baja del umbral, la fusión se bloquea sola. La suite creció de forma orgánica a medida que se identificaban rutas críticas.</aside>
+  </section>
+
+  <!-- 28 · E2E -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Resultados · End-to-end</p>
+      <h2>Flujos de usuario validados con Cypress</h2>
+    </div>
+    <div class="slide__body">
+      <div class="media">
+        <div class="txt" style="display:flex; flex-direction:column; gap:18px">
+          <div class="kpi"><b>12</b><span>specs automatizados</span></div>
+          <div class="kpi"><b>47</b><span>casos de prueba</span></div>
+          <div class="kpi"><b>100%</b><span>ejecución en verde (Docker Compose)</span></div>
+        </div>
+        <figure>
+          <div class="figure" style="min-height:340px"><img src="img/cypress-e2e.png" alt="Cypress E2E"></div>
+          <figcaption>Fig. 9 · Ejecución completa de la suite E2E.</figcaption>
+        </figure>
+      </div>
+    </div>
+    <aside class="notes">Doce specs con cuarenta y siete casos simulan al usuario real: autenticación OAuth, flujos de sitios, métricas. Cubren las capas de presentación, aplicación y persistencia de forma coordinada —validan la arquitectura frontend adaptada de paso.</aside>
+  </section>
+
+  <!-- 29 · BENCHMARKING -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Resultados · Rendimiento</p>
+      <h2>Benchmarking con k6</h2>
+    </div>
+    <div class="slide__body">
+      <div class="media media-left">
+        <div class="txt">
+          <ul class="bullets" style="font-size:21px">
+            <li><b>50 usuarios virtuales</b>, 3 escenarios con endpoints equivalentes en ambas arquitecturas</li>
+            <li>Métricas: <b>p95/p99, throughput, tasa de error</b> + CPU/memoria en Prometheus</li>
+            <li>Hipótesis: el monolito exhibe <b>mayor latencia</b> bajo concurrencia</li>
+          </ul>
+        </div>
+        <figure>
+          <div class="figure" style="min-height:340px"><img src="img/benchmarking-grafana.png" alt="Benchmark Grafana"></div>
+          <figcaption>Fig. 10 · Métricas del experimento visualizadas en Grafana.</figcaption>
+        </figure>
+      </div>
+    </div>
+    <aside class="notes">Diseño experimental con k6: mismos escenarios y misma carga contra ambas arquitecturas, tokens JWT reales y datos sintéticos. Con honestidad: el monolito en producción no podía someterse a carga real, así que la comparación queda acotada a los escenarios definidos —es una de las limitaciones declaradas.</aside>
+  </section>
+
+  <!-- 30 · SIMULACIÓN DE CAOS -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Resultados · Resiliencia</p>
+      <h2>Simulación de caos: caída de un servicio</h2>
+    </div>
+    <div class="slide__body">
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-year">① Caída</div>
+          <p>Se detiene <b>ms-site</b> deliberadamente; el resto del ecosistema sigue operando.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">② Detección</div>
+          <p>PAIMA detecta la caída vía health checks en su ciclo de monitoreo.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">③ Alerta P1</div>
+          <p>Clasifica la incidencia y notifica al administrador por correo.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">④ Diagnóstico IA</div>
+          <p>El operador consulta al asistente y aprueba la acción de reinicio.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">⑤ Recuperación</div>
+          <p>PAIMA ejecuta el reinicio; el servicio vuelve a estado saludable.</p>
+        </div>
+      </div>
+    </div>
+    <aside class="notes">El experimento clave: matamos ms-site a propósito. Dos cosas se demuestran a la vez: el aislamiento de fallos —el resto del ecosistema siguió vivo— y el ciclo completo de PAIMA: detectar, clasificar como P1, notificar, diagnosticar con IA, y recuperar tras la aprobación humana.</aside>
+  </section>
+
+  <!-- 31 · EVIDENCIA CAOS -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Resultados · Resiliencia</p>
+      <h2>La evidencia del experimento</h2>
+    </div>
+    <div class="slide__body">
+      <div class="cols">
+        <figure>
+          <div class="figure" style="min-height:380px"><img src="img/paima-email-alert.png" alt="Alerta por correo"></div>
+          <figcaption>Fig. 11 · Alerta P1 recibida por correo electrónico.</figcaption>
+        </figure>
+        <figure>
+          <div class="figure" style="min-height:380px"><img src="img/paima-incident-detail.png" alt="Detalle de incidencia"></div>
+          <figcaption>Fig. 12 · Detalle de la incidencia en el panel de PAIMA.</figcaption>
+        </figure>
+      </div>
+    </div>
+    <aside class="notes">La evidencia concreta: a la izquierda el correo de alerta que llega al administrador; a la derecha el detalle de la incidencia con su clasificación y contexto. La intervención humana se limitó a evaluar y aprobar.</aside>
+  </section>
+
+  <!-- 32 · COMPARATIVA GLOBAL -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Resultados</p>
+      <h2>Análisis comparativo global</h2>
+    </div>
+    <div class="slide__body">
+      <table class="tbl" style="font-size:18px">
+        <tr><th>Dimensión</th><th>Monolito legacy</th><th>Ecosistema de microservicios</th></tr>
+        <tr><td>Cobertura de código</td><td>Inexistente</td><td><b class="accent">71–81%</b> medida y exigida por PR</td></tr>
+        <tr><td>Validación de cambios</td><td>Manual, alto riesgo</td><td>Pipeline automático con merge bloqueado</td></tr>
+        <tr><td>Resiliencia</td><td>Un fallo compromete todo</td><td>Aislamiento + recuperación asistida</td></tr>
+        <tr><td>Observabilidad</td><td>Nula</td><td>Prometheus, Grafana y Loki centralizados</td></tr>
+        <tr><td>Mantenimiento</td><td>Conocimiento tácito</td><td><b class="accent">Sistemático y reproducible</b></td></tr>
+      </table>
+    </div>
+    <aside class="notes">La tabla resume el trabajo: en cada dimensión evaluada, el ecosistema no solo supera al monolito —cambia la naturaleza del mantenimiento, de artesanal y tácito a sistemático y reproducible.</aside>
+  </section>
+
+  <!-- 33 · LO QUE SE DEMOSTRÓ -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Resultados</p>
+      <h2>Lo que quedó demostrado</h2>
+    </div>
+    <div class="slide__body">
+      <ul class="check" style="font-size:22px">
+        <li class="fragment">El ecosistema <b>aísla fallos</b>: la caída de un servicio no detiene al sistema</li>
+        <li class="fragment">La calidad se <b>mide y se exige</b> automáticamente en cada cambio</li>
+        <li class="fragment">PAIMA <b>reduce la carga cognitiva</b>: detecta, diagnostica y propone; el humano solo aprueba</li>
+        <li class="fragment">Un colaborador nuevo puede <b>operar el sistema sin conocimiento tácito</b></li>
+      </ul>
+    </div>
+    <aside class="notes">Cuatro afirmaciones, cada una respaldada por un experimento del capítulo 4. Con esto paso a las conclusiones.</aside>
+  </section>
+
+  <!-- 34 · SECCIÓN 05 -->
+  <section class="slide slide--section">
+    <p class="kicker">Sección</p>
+    <div class="num">05</div>
+    <h2>Conclusiones</h2>
+    <p>Qué se logró, qué limita el trabajo y hacia dónde puede crecer.</p>
+  </section>
+
+  <!-- 35 · CONCLUSIONES -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Conclusiones</p>
+      <h2>Tres transformaciones interdependientes</h2>
+    </div>
+    <div class="slide__body">
+      <ul class="check" style="font-size:21px">
+        <li><b>Arquitectónica:</b> backend migrado a dominios acotados (UAA, Site, Notify), cada uno con BD propia y despliegue autónomo; frontend adaptado como cliente OAuth2 distribuido</li>
+        <li><b>Metodológica:</b> validación automatizada en cada cambio — cobertura exigida por pipeline, E2E verde, esquemas versionados</li>
+        <li><b>Operativa:</b> PAIMA ejecuta el ciclo MAPE-K con IA y fue validado en simulación de caos</li>
+        <li><b>Contribución original:</b> implementación práctica del framework MAPE-K + IA en un contexto académico real, on-premise y con recursos limitados</li>
+      </ul>
+    </div>
+    <aside class="notes">Las conclusiones se organizan en tres transformaciones: la arquitectónica —desacoplar—, la metodológica —validar todo cambio— y la operativa —delegar el diagnóstico en un ciclo autónomo supervisado—. La contribución original es haber aterrizado el framework MAPE-K con IA en un contexto real con restricciones duras.</aside>
+  </section>
+
+  <!-- 36 · LIMITACIONES -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Limitaciones</p>
+      <h2>Los bordes del trabajo, con honestidad</h2>
+    </div>
+    <div class="slide__body">
+      <ul class="x" style="font-size:21px">
+        <li>El ciclo de monitoreo de PAIMA (<b>5 min</b>) acota el tiempo de detección de una incidencia</li>
+        <li>La calidad del diagnóstico <b>depende del proveedor de IA</b>: remoto razona mejor; local/fallback es más simple</li>
+        <li>El benchmark es <b>acotado</b>: el monolito en producción no podía someterse a carga sin afectar usuarios</li>
+        <li>Frontend sobre <b>Vue 2</b> (fin de vida); validación en Docker Compose local con datos anonimizados</li>
+      </ul>
+    </div>
+    <aside class="notes">Declaro las limitaciones antes de que me las pregunten: la periodicidad del ciclo, la dependencia del proveedor de IA, el benchmark acotado por la imposibilidad de cargar el sistema en producción, y la validación en entorno local. Ninguna invalida los resultados; delimitan su alcance.</aside>
+  </section>
+
+  <!-- 37 · TRABAJO FUTURO -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Trabajo futuro</p>
+      <h2>Líneas de evolución identificadas</h2>
+    </div>
+    <div class="slide__body">
+      <ul class="arrow" style="font-size:21px">
+        <li><b>API Gateway</b>: routing y autenticación centralizados en el borde</li>
+        <li><b>Soberanía tecnológica</b>: modelos de lenguaje locales y especializados en operaciones</li>
+        <li><b>PAIMA</b> hacia un agente semi-integrado de desarrollo y, a largo plazo, una arquitectura multi-agente</li>
+        <li><b>Frontend</b>: migración a Vue 3 y cobertura de pruebas en el cliente</li>
+        <li>Migración de <b>datos históricos</b> de producción y trazabilidad distribuida</li>
+      </ul>
+    </div>
+    <aside class="notes">Las líneas de evolución nacen de las propias limitaciones: gateway centralizado, IA local especializada para no depender de proveedores externos, PAIMA más integrado al ciclo de desarrollo, Vue 3, y la migración de los datos históricos que quedó fuera de alcance.</aside>
+  </section>
+
+  <!-- 38 · FRASE DE CIERRE -->
+  <section class="slide slide--quote">
+    <blockquote>
+      Un sistema desacoplado, observable y autogestionado, que puede ser mantenido por colaboradores académicos temporales sin depender del conocimiento tácito.
+    </blockquote>
+    <p class="attrib">— El aporte central de este trabajo</p>
+    <aside class="notes">Vuelvo al problema del inicio: la rotación de colaboradores. Lo que hoy existe es un sistema que se explica a sí mismo —con pruebas, observabilidad y un asistente— precisamente para que el conocimiento no dependa de personas que rotan. Ese es el aporte.</aside>
+  </section>
+
+  <!-- 39 · CIERRE -->
+  <section class="slide slide--closing">
+    <h2>¡Gracias!</h2>
+    <p class="sub">Quedo atento a las preguntas del jurado</p>
+    <div class="row">
+      <span class="chip">Br. Frank Ángel Ponte Delgado</span>
+      <span class="chip">Tutor: Prof. Walter Hernández</span>
+      <span class="chip">PortalAsig · Facultad de Ciencias · UCV</span>
+    </div>
+    <aside class="notes">Cierro retomando la frase anterior y abro el espacio de preguntas. Posibles preguntas a preparar: por qué Spring Boot, por qué no API Gateway, cómo escala PAIMA a más servicios, qué pasa si la IA se equivoca (fallback + aprobación humana).</aside>
+  </section>
+
+</main>
+<div class="hud" aria-hidden="true">
+  <div class="hud__bar" id="hudBar"></div>
+  <div class="hud__foot" id="hudFoot"></div>
+  <div class="hud__count" id="hudCount"></div>
+</div>
+<div class="notes-panel" id="notesPanel"></div>
+
+<script>
+/* ==========================================================================
+   Motor del visor: navegación, escala, fragments, índice, notas, impresión
+   ========================================================================== */
+(function () {
+  "use strict";
+  var body   = document.body;
+  var deck   = document.getElementById("deck");
+  var slides = Array.prototype.slice.call(deck.querySelectorAll(".slide"));
+  var bar    = document.getElementById("hudBar");
+  var count  = document.getElementById("hudCount");
+  var foot   = document.getElementById("hudFoot");
+  var notesP = document.getElementById("notesPanel");
+  var OV_COLS = 4;
+
+  var i = 0;    // índice de lámina actual
+  var f = 0;    // fragments revelados en la lámina actual
+
+  foot.textContent = body.getAttribute("data-footer") || "";
+
+  function frags(slide) {
+    return Array.prototype.slice.call(slide.querySelectorAll(".fragment"));
+  }
+
+  function fit() {
+    var z;
+    if (body.classList.contains("overview")) {
+      var cellW = (window.innerWidth - 52 - (OV_COLS - 1) * 18) / OV_COLS;
+      z = cellW / 1280;
+    } else {
+      z = Math.min(window.innerWidth / 1280, window.innerHeight / 720) * 0.96;
+    }
+    slides.forEach(function (s) { s.style.zoom = z; });
+  }
+
+  function updateHud() {
+    bar.style.width = ((i + 1) / slides.length * 100) + "%";
+    count.textContent = (i + 1) + " / " + slides.length;
+    var n = slides[i].querySelector("aside.notes");
+    notesP.innerHTML = n
+      ? "<b>Notas " + (i + 1) + ":</b> " + n.innerHTML
+      : "<span style='opacity:.5'>Sin notas en esta lámina</span>";
+  }
+
+  function show(n, revealAll) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function (s, k) { s.classList.toggle("is-active", k === i); });
+    var fr = frags(slides[i]);
+    fr.forEach(function (el) { el.classList.remove("is-in"); });
+    f = 0;
+    if (revealAll) {
+      fr.forEach(function (el) { el.classList.add("is-in"); });
+      f = fr.length;
+    }
+    updateHud();
+    if (history.replaceState) history.replaceState(null, "", "#/" + (i + 1));
+  }
+
+  function next() {
+    var fr = frags(slides[i]);
+    if (f < fr.length) { fr[f].classList.add("is-in"); f++; updateHud(); }
+    else if (i < slides.length - 1) show(i + 1);
+  }
+
+  function prev() {
+    if (f > 0) {
+      f--;
+      frags(slides[i])[f].classList.remove("is-in");
+      updateHud();
+    } else if (i > 0) show(i - 1, true);
+  }
+
+  function toggleOverview(on) {
+    var want = (typeof on === "boolean") ? on : !body.classList.contains("overview");
+    body.classList.toggle("overview", want);
+    fit();
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    switch (e.key) {
+      case "ArrowRight": case " ": case "PageDown":
+        e.preventDefault();
+        if (body.classList.contains("overview")) toggleOverview(false);
+        next(); break;
+      case "ArrowLeft": case "PageUp":
+        e.preventDefault();
+        if (body.classList.contains("overview")) toggleOverview(false);
+        prev(); break;
+      case "Home": e.preventDefault(); show(0); break;
+      case "End":  e.preventDefault(); show(slides.length - 1, true); break;
+      case "o": case "O": toggleOverview(); break;
+      case "Escape": toggleOverview(false); body.classList.remove("show-notes"); break;
+      case "n": case "N":
+        body.classList.toggle("show-notes"); updateHud(); break;
+      case "f": case "F":
+        if (document.fullscreenElement) document.exitFullscreen();
+        else document.documentElement.requestFullscreen();
+        break;
+    }
+  });
+
+  deck.addEventListener("click", function (e) {
+    if (!body.classList.contains("overview")) return;
+    var s = e.target.closest(".slide");
+    if (!s) return;
+    toggleOverview(false);
+    show(slides.indexOf(s), true);
+  });
+
+  window.addEventListener("resize", fit);
+  window.addEventListener("beforeprint", function () {
+    slides.forEach(function (s) { s.style.zoom = ""; });
+  });
+  window.addEventListener("afterprint", fit);
+
+  // Estado inicial: #/N en la URL, o 1
+  var m = (location.hash || "").match(/^#\/(\d+)$/);
+  show(m ? parseInt(m[1], 10) - 1 : 0);
+  fit();
+
+  // ?print → vista apilada para revisar todas las láminas en pantalla
+  if (new URLSearchParams(location.search).has("print")) {
+    body.classList.add("print-view");
+  }
+})();
+</script>
+</body>
+</html>
