@@ -308,10 +308,17 @@ body.print-view .hud, body.print-view .notes-panel{ display: none !important; }
 /* --------------------------------------------------------------- impresión */
 /* ------------------------------------------------- anotaciones (Supabase) */
 .anno-fab{
-  position: fixed; right: 18px; bottom: 46px; z-index: 50;
-  width: 48px; height: 48px; border-radius: 50%; border: none; cursor: pointer;
-  background: var(--accent); color: #fff; font-size: 20px;
-  box-shadow: 0 4px 14px rgba(0,0,0,.35); display: grid; place-items: center;
+  position: fixed; right: 18px; bottom: 40px; z-index: 50;
+  height: 46px; padding: 0 18px; border-radius: 999px; border: none; cursor: pointer;
+  background: var(--accent); color: #fff; font: 700 14.5px var(--font);
+  box-shadow: 0 4px 14px rgba(0,0,0,.35); display: flex; align-items: center; gap: 8px;
+  animation: annoPulse 2.6s ease-out infinite;
+}
+.anno-fab.seen{ animation: none; }
+@keyframes annoPulse{
+  0%{ box-shadow: 0 4px 14px rgba(0,0,0,.35), 0 0 0 0 rgba(0,140,186,.5); }
+  70%{ box-shadow: 0 4px 14px rgba(0,0,0,.35), 0 0 0 18px rgba(0,140,186,0); }
+  100%{ box-shadow: 0 4px 14px rgba(0,0,0,.35), 0 0 0 0 rgba(0,140,186,0); }
 }
 .anno-fab:hover{ filter: brightness(1.12); }
 .anno-fab .badge[hidden]{ display: none; }
@@ -336,6 +343,19 @@ body.anno-open .anno-panel{ transform: none; }
 .anno-list{ flex: 1; overflow: auto; padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
 .anno-item{ background: var(--soft); border-radius: 10px; padding: 10px 12px; font-size: 14px; line-height: 1.45; }
 .anno-item .meta{ font-size: 11.5px; color: var(--muted); margin-top: 6px; }
+.anno-item .head{ display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; }
+.estado{ font-size: 10.5px; font-weight: 800; padding: 2px 9px; border-radius: 999px; text-transform: uppercase; letter-spacing: .05em; }
+.estado--pendiente{ background: #fdf0d7; color: #a86a00; }
+.estado--completada{ background: #e0f2e9; color: var(--good); }
+.anno-item.is-done{ opacity: .62; }
+.anno-toggle{ border: none; background: none; color: var(--accent); font: 600 12px var(--font); cursor: pointer; padding: 2px 0; }
+.anno-toggle:hover{ text-decoration: underline; }
+.anno-filters{ display: flex; gap: 8px; margin-bottom: 22px; }
+.anno-filters button{
+  border: 1px solid var(--line); background: none; border-radius: 999px;
+  padding: 6px 16px; font: 600 13px var(--font); color: var(--muted); cursor: pointer;
+}
+.anno-filters button.is-active{ background: var(--accent); border-color: var(--accent); color: #fff; }
 .anno-empty{ color: var(--muted); font-size: 14px; text-align: center; margin-top: 26px; line-height: 1.6; }
 .anno-form{ border-top: 1px solid var(--line); padding: 13px 18px; display: flex; flex-direction: column; gap: 8px; }
 .anno-form input, .anno-form textarea{
@@ -393,7 +413,7 @@ body.anno-review-open .anno-review-close{ display: block; }
 }
 </style>
 </head>
-<body data-footer="PortalAsig · Microservicios + IA — Defensa TEG">
+<body data-footer="Mantenimiento asistido por IA en arquitectura de microservicios · PortalAsig — TEG">
 <main id="deck">
 
   <!-- 1 · PORTADA -->
@@ -1320,7 +1340,7 @@ body.anno-review-open .anno-review-close{ display: block; }
   }
 })();
 </script>
-<button class="anno-fab" id="annoFab" title="Anotaciones">💬<span class="badge" id="annoBadge" hidden>0</span></button>
+<button class="anno-fab" id="annoFab" title="Dejar una anotación">💬 Anotaciones<span class="badge" id="annoBadge" hidden>0</span></button>
 <aside class="anno-panel" id="annoPanel" aria-label="Anotaciones">
   <header><b id="annoTitle">Anotaciones</b><button id="annoClose" title="Cerrar">✕</button></header>
   <div class="anno-list" id="annoList"></div>
@@ -1374,10 +1394,29 @@ body.anno-review-open .anno-review-close{ display: block; }
   function fmt(ts) {
     return new Date(ts).toLocaleString("es-VE", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
   }
+  function est(a) { return a.estado || "pendiente"; }
   function itemHtml(a) {
-    return '<div class="anno-item">' + esc(a.texto) +
+    var done = est(a) === "completada";
+    return '<div class="anno-item' + (done ? " is-done" : "") + '">' +
+      '<div class="head"><span class="estado estado--' + (done ? "completada" : "pendiente") + '">' +
+      (done ? "Completada" : "Pendiente") + '</span>' +
+      '<button class="anno-toggle" data-id="' + a.id + '" data-done="' + (done ? "1" : "0") + '">' +
+      (done ? "↩ Reabrir" : "✓ Completar") + '</button></div>' +
+      esc(a.texto) +
       '<div class="meta">' + esc(a.autor || "Tutor") + " · " + fmt(a.created_at) + "</div></div>";
   }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest(".anno-toggle");
+    if (!b) return;
+    var done = b.getAttribute("data-done") === "1";
+    fetch(SUPA_URL + "/rest/v1/anotaciones?id=eq." + b.getAttribute("data-id"), {
+      method: "PATCH", headers: HEADERS,
+      body: JSON.stringify({ estado: done ? "pendiente" : "completada" })
+    })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return load(); })
+      .then(function () { showToast(done ? "Reabierta" : "Completada ✓"); })
+      .catch(function () { showToast("No se pudo actualizar"); });
+  });
   function showToast(msg) {
     toast.textContent = msg;
     toast.classList.add("show");
@@ -1400,7 +1439,7 @@ body.anno-review-open .anno-review-close{ display: block; }
       : '<div class="anno-empty">Sin anotaciones en esta lámina.<br>Sé la primera persona en dejar una 💬</div>';
   }
   function load() {
-    return fetch(SUPA_URL + "/rest/v1/anotaciones?select=lamina,autor,texto,created_at&order=created_at.asc", { headers: HEADERS })
+    return fetch(SUPA_URL + "/rest/v1/anotaciones?select=*&order=created_at.asc", { headers: HEADERS })
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
       .then(function (rows) {
         data = rows;
@@ -1412,6 +1451,7 @@ body.anno-review-open .anno-review-close{ display: block; }
   }
 
   fab.addEventListener("click", function () {
+    fab.classList.add("seen");
     body.classList.add("anno-open");
     renderList();
     load();
@@ -1447,18 +1487,36 @@ body.anno-review-open .anno-review-close{ display: block; }
   };
 
   // ------------------------------------------------------- modo revisión
+  var filter = "todas";
   function renderReview() {
     var groups = {};
-    data.forEach(function (a) { (groups[a.lamina] = groups[a.lamina] || []).push(a); });
+    data.forEach(function (a) {
+      if (filter === "pendientes" && est(a) === "completada") return;
+      if (filter === "completadas" && est(a) !== "completada") return;
+      (groups[a.lamina] = groups[a.lamina] || []).push(a);
+    });
+    var pend = data.filter(function (a) { return est(a) !== "completada"; }).length;
+    var done = data.length - pend;
     var keys = Object.keys(groups).sort(function (a, b) { return a - b; });
     review.innerHTML =
       "<h1>Anotaciones recibidas</h1>" +
-      '<div class="sub">' + data.length + " en total · agrupadas por lámina</div>" +
+      '<div class="sub">' + data.length + " en total · " + pend + " pendientes · " + done + " completadas</div>" +
+      '<div class="anno-filters">' +
+        '<button data-f="todas"' + (filter === "todas" ? ' class="is-active"' : "") + ">Todas</button>" +
+        '<button data-f="pendientes"' + (filter === "pendientes" ? ' class="is-active"' : "") + ">Pendientes (" + pend + ")</button>" +
+        '<button data-f="completadas"' + (filter === "completadas" ? ' class="is-active"' : "") + ">Completadas (" + done + ")</button>" +
+      "</div>" +
       (keys.length ? keys.map(function (k) {
         return '<div class="anno-group"><h2>Lámina ' + k +
           ' <button data-go="' + k + '">Ir a la lámina →</button></h2>' +
           groups[k].map(itemHtml).join("") + "</div>";
-      }).join("") : '<div class="sub">Aún no hay anotaciones.</div>');
+      }).join("") : '<div class="sub">Nada por aquí con este filtro.</div>');
+    Array.prototype.forEach.call(review.querySelectorAll("[data-f]"), function (btn) {
+      btn.addEventListener("click", function () {
+        filter = btn.getAttribute("data-f");
+        renderReview();
+      });
+    });
     Array.prototype.forEach.call(review.querySelectorAll("[data-go]"), function (btn) {
       btn.addEventListener("click", function () {
         body.classList.remove("anno-review-open");
