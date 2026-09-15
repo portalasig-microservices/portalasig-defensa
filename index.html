@@ -996,14 +996,14 @@ body.anno-review-open .anno-review-close{ display: block; }
     </div>
     <div class="slide__body">
       <div class="kpis">
-        <div class="kpi"><b>71–81%</b><span>líneas por microservicio</span></div>
+        <div class="kpi"><b>80,5–91,8%</b><span>líneas por microservicio</span></div>
         <div class="kpi"><b>70 / 60</b><span>umbral líneas / ramas en cada PR</span></div>
         <div class="kpi"><b>0%</b><span>cobertura del monolito legacy</span></div>
         <div class="kpi"><b>4</b><span>pipelines con merge bloqueado</span></div>
       </div>
       <p class="lead fragment" style="font-size:21px">De <b>cero</b> a cobertura <b>medida y exigida</b> en cada cambio: la calidad se volvió sistemática.</p>
     </div>
-    <aside class="notes">El contraste es cualitativo: el monolito no tenía ni una prueba; hoy cada servicio mide entre 71 y 81 por ciento de líneas, y si un PR baja del umbral, la fusión se bloquea sola. La suite creció de forma orgánica a medida que se identificaban rutas críticas.</aside>
+    <aside class="notes">El contraste es cualitativo: el monolito no tenía ni una prueba; hoy cada servicio mide entre 80,5 y 91,8 por ciento de líneas —UAA 84,6, Site 80,5, Notify 91,8, PAIMA 85,5— y si un PR baja del umbral 70/60, la fusión se bloquea sola. Los tests son de integración contra MySQL real con Testcontainers, no H2; escribirlos destapó 11 bugs reales antes de producción.</aside>
   </section>
 
   <!-- 28 · E2E -->
@@ -1016,8 +1016,8 @@ body.anno-review-open .anno-review-close{ display: block; }
       <div class="media">
         <div class="txt" style="display:flex; flex-direction:column; gap:18px">
           <div class="kpi"><b>12</b><span>specs automatizados</span></div>
-          <div class="kpi"><b>47</b><span>casos de prueba</span></div>
-          <div class="kpi"><b>100%</b><span>ejecución en verde (Docker Compose)</span></div>
+          <div class="kpi"><b>52</b><span>casos de prueba</span></div>
+          <div class="kpi"><b>1m16s</b><span>corrida completa en verde (Docker Compose)</span></div>
         </div>
         <figure>
           <div class="figure" style="min-height:340px"><img src="img/cypress-e2e.png" alt="Cypress E2E"></div>
@@ -1025,7 +1025,7 @@ body.anno-review-open .anno-review-close{ display: block; }
         </figure>
       </div>
     </div>
-    <aside class="notes">Doce specs con cuarenta y siete casos simulan al usuario real: autenticación OAuth, flujos de sitios, métricas. Cubren las capas de presentación, aplicación y persistencia de forma coordinada —validan la arquitectura frontend adaptada de paso.</aside>
+    <aside class="notes">Doce specs con cincuenta y dos casos simulan al usuario real contra el stack sembrado con datos anonimizados: autenticación OAuth, flujos de sitios, administración, PAIMA. Corren en 1 minuto 16 segundos y 18 de cada 20 corridas salen cien por ciento verdes —los dos fallos fueron del screenshot del navegador, no de aserciones. La suite incluso descubrió un bug real: evaluaciones sembradas con un tipo inexistente que devolvía 500.</aside>
   </section>
 
   <!-- 29 · BENCHMARKING -->
@@ -1038,9 +1038,10 @@ body.anno-review-open .anno-review-close{ display: block; }
       <div class="media media-left">
         <div class="txt">
           <ul class="bullets" style="font-size:21px">
-            <li><b>50 usuarios virtuales</b>, 3 escenarios con endpoints equivalentes; ambas arquitecturas desplegadas en local con idénticos recursos</li>
-            <li>Métricas: <b>p95/p99, throughput, tasa de error</b> + CPU/memoria en Prometheus</li>
-            <li>Hipótesis: el monolito exhibe <b>mayor latencia</b> bajo concurrencia</li>
+            <li><b>50 usuarios virtuales</b>, 3 escenarios con endpoints equivalentes; ambas arquitecturas en local con idénticos recursos, sobre los mismos datos</li>
+            <li>Lectura: MS <b>136,7 ms · 348 req/s · 0% error</b> vs legacy 262,9 ms · 181 req/s → <b>1,9×</b></li>
+            <li>Escritura: empate (~86 ms) con MS <b>0% error</b> vs 1,39% del legacy (idempotencia)</li>
+            <li>Auth: el costo de <b>bcrypt</b> queda aislado en UAA (169 ms vs 37 ms con MD5)</li>
           </ul>
         </div>
         <figure>
@@ -1049,7 +1050,7 @@ body.anno-review-open .anno-review-close{ display: block; }
         </figure>
       </div>
     </div>
-    <aside class="notes">Experimento con k6: mismos escenarios y misma carga contra ambas arquitecturas, tokens JWT reales y datos sintéticos. Ambos stacks se desplegaron en local sobre el mismo hardware con idéntica asignación de CPU y memoria, así que la comparación es término a término en igualdad de recursos; la limitación declarada es que los valores absolutos corresponden a un entorno controlado, no a producción.</aside>
+    <aside class="notes">Resultado del benchmark: lectura 1,9 veces más rápida y casi el doble de throughput; escritura empatada pero con cero errores —el legacy devuelve 500 ante duplicados, el MS responde 200 idempotente—; y la autenticación es más lenta a propósito: bcrypt cuesta unas 5 veces más CPU que el MD5 del legacy, y ese costo queda aislado en UAA, que escala por sí solo. Cero fallas de plataforma en más de 390 mil peticiones. La limitación declarada: entorno controlado local, no producción.</aside>
   </section>
 
   <!-- 30 · SIMULACIÓN DE CAOS -->
@@ -1082,7 +1083,7 @@ body.anno-review-open .anno-review-close{ display: block; }
         </div>
       </div>
     </div>
-    <aside class="notes">El experimento clave: matamos ms-site a propósito. Dos cosas se demuestran a la vez: el aislamiento de fallos —el resto del ecosistema siguió vivo— y el ciclo completo de PAIMA: detectar, clasificar como P1, notificar, diagnosticar con IA, y recuperar tras la aprobación humana.</aside>
+    <aside class="notes">El experimento clave: matamos ms-site a propósito, tres iteraciones. Dos cosas se demuestran a la vez: el aislamiento de fallos —el resto del ecosistema siguió vivo— y el ciclo completo de PAIMA con tiempos medidos: detección en un solo ciclo MAPE de unos dos minutos —peor caso cuatro minutos cincuenta y nueve segundos por la ventana del scheduler de cinco minutos—, correo P1 con diagnóstico de la IA, y recuperación en unos veinte segundos tras la aprobación humana.</aside>
   </section>
 
   <!-- 31 · EVIDENCIA CAOS -->
@@ -1103,7 +1104,7 @@ body.anno-review-open .anno-review-close{ display: block; }
         </figure>
       </div>
     </div>
-    <aside class="notes">La evidencia concreta: a la izquierda el correo de alerta que llega al administrador; a la derecha el detalle de la incidencia con su clasificación y contexto. La intervención humana se limitó a evaluar y aprobar.</aside>
+    <aside class="notes">La evidencia concreta: a la izquierda el correo que PAIMA autogenera al detectar la falla —asunto P1, diagnóstico de la IA, acción sugerida y enlace al panel—; a la derecha el detalle de la incidencia con su clasificación y contexto. La intervención humana se limitó a evaluar y aprobar; la acción ejecutada quedó auditada con actor y comentario.</aside>
   </section>
 
   <!-- 32 · COMPARATIVA GLOBAL -->
@@ -1115,7 +1116,7 @@ body.anno-review-open .anno-review-close{ display: block; }
     <div class="slide__body">
       <table class="tbl" style="font-size:18px">
         <tr><th>Dimensión</th><th>Monolito legacy</th><th>Ecosistema de microservicios</th></tr>
-        <tr><td>Cobertura de código</td><td>Inexistente</td><td><b class="accent">71–81%</b> medida y exigida por PR</td></tr>
+        <tr><td>Cobertura de código</td><td>Inexistente</td><td><b class="accent">80,5–91,8%</b> medida y exigida por PR</td></tr>
         <tr><td>Validación de cambios</td><td>Manual, alto riesgo</td><td>Pipeline automático con merge bloqueado</td></tr>
         <tr><td>Resiliencia</td><td>Un fallo compromete todo</td><td>Aislamiento + recuperación asistida</td></tr>
         <tr><td>Observabilidad</td><td>Nula</td><td>Prometheus, Grafana y Loki centralizados</td></tr>
@@ -1134,6 +1135,7 @@ body.anno-review-open .anno-review-close{ display: block; }
     <div class="slide__body">
       <ul class="check" style="font-size:22px">
         <li class="fragment">El ecosistema <b>aísla fallos</b>: la caída de un servicio no detiene al sistema</li>
+        <li class="fragment">Rinde mejor: <b>1,9×</b> en lectura concurrente y <b>0% de errores</b> en 390 mil peticiones</li>
         <li class="fragment">La calidad se <b>mide y se exige</b> automáticamente en cada cambio</li>
         <li class="fragment">PAIMA <b>reduce la carga cognitiva</b>: detecta, diagnostica y propone; el humano solo aprueba</li>
         <li class="fragment">Un colaborador nuevo puede <b>operar el sistema sin conocimiento tácito</b></li>
