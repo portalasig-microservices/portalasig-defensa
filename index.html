@@ -277,7 +277,31 @@ ol.agenda li::before{
   color: #fff; opacity: .55; font-size: 13px; letter-spacing: .04em;
 }
 .hud__foot{ left: 18px; }
-.hud__count{ right: 18px; font-variant-numeric: tabular-nums; }
+.hud__count{ right: 130px; font-variant-numeric: tabular-nums; }
+
+/* ------------------------------------------- controles táctiles / botones */
+.decknav{
+  position: fixed; bottom: 10px; right: 14px; z-index: 45;
+  display: flex; gap: 8px; align-items: center;
+}
+.decknav button, .fsbtn{
+  width: 44px; height: 44px; border-radius: 999px; border: 1px solid rgba(255,255,255,.35);
+  background: rgba(40,55,71,.78); color: #fff; font-size: 20px; line-height: 1;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  transition: background .15s, transform .1s;
+  touch-action: manipulation; user-select: none; -webkit-user-select: none;
+}
+.decknav button:active, .fsbtn:active{ background: var(--accent); transform: scale(.94); }
+.fsbtn{ position: fixed; top: 12px; right: 14px; z-index: 45; font-size: 17px; }
+.fsbtn.is-fs{ background: var(--accent); }
+@media (hover: hover){
+  .decknav, .fsbtn{ opacity: .7; }
+  .decknav:hover, .fsbtn:hover{ opacity: 1; }
+}
+body.overview .decknav, body.overview .fsbtn,
+body.print-view .decknav, body.print-view .fsbtn{ display: none; }
+@media print{ .decknav, .fsbtn{ display: none !important; } }
 
 .notes-panel{
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
@@ -308,7 +332,7 @@ body.print-view .hud, body.print-view .notes-panel{ display: none !important; }
 /* --------------------------------------------------------------- impresión */
 /* ------------------------------------------------- anotaciones (Supabase) */
 .anno-fab{
-  position: fixed; right: 18px; bottom: 40px; z-index: 50;
+  position: fixed; right: 18px; bottom: 66px; z-index: 50;
   height: 46px; padding: 0 18px; border-radius: 999px; border: none; cursor: pointer;
   background: var(--accent); color: #fff; font: 700 14.5px var(--font);
   box-shadow: 0 4px 14px rgba(0,0,0,.35); display: flex; align-items: center; gap: 8px;
@@ -1205,6 +1229,11 @@ body.anno-review-open .anno-review-close{ display: block; }
   <div class="hud__foot" id="hudFoot"></div>
   <div class="hud__count" id="hudCount"></div>
 </div>
+<div class="decknav" id="decknav">
+  <button type="button" id="navPrev" aria-label="Lámina anterior" title="Anterior">&#8249;</button>
+  <button type="button" id="navNext" aria-label="Lámina siguiente" title="Siguiente">&#8250;</button>
+</div>
+<button type="button" class="fsbtn" id="fsBtn" aria-label="Pantalla completa" title="Pantalla completa">&#x26F6;</button>
 <div class="notes-panel" id="notesPanel"></div>
 
 <script>
@@ -1304,11 +1333,74 @@ body.anno-review-open .anno-review-close{ display: block; }
       case "n": case "N":
         body.classList.toggle("show-notes"); updateHud(); break;
       case "f": case "F":
-        if (document.fullscreenElement) document.exitFullscreen();
-        else document.documentElement.requestFullscreen();
+        toggleFullscreen();
         break;
     }
   });
+
+  /* Pantalla completa: API estándar con prefijo webkit (iPadOS); si el
+     dispositivo no la soporta (iPhone Safari), el botón se oculta. */
+  var fsBtn = document.getElementById("fsBtn");
+  function toggleFullscreen() {
+    var d = document, el = d.documentElement;
+    var fsEl = d.fullscreenElement || d.webkitFullscreenElement;
+    try {
+      if (fsEl) {
+        var exit = d.exitFullscreen || d.webkitExitFullscreen;
+        if (exit) exit.call(d);
+        return;
+      }
+      var req = el.requestFullscreen || el.webkitRequestFullscreen;
+      if (req) {
+        var p = req.call(el);
+        if (p && p.catch) p.catch(function () {});
+      }
+    } catch (err) { /* dispositivo sin soporte: se deja la vista normal */ }
+  }
+  function syncFsBtn() {
+    var fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+    fsBtn.classList.toggle("is-fs", !!fsEl);
+  }
+  if (!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen)) {
+    fsBtn.style.display = "none";
+  } else {
+    fsBtn.addEventListener("click", toggleFullscreen);
+    document.addEventListener("fullscreenchange", syncFsBtn);
+    document.addEventListener("webkitfullscreenchange", syncFsBtn);
+  }
+
+  /* Botones de navegación (útiles en móvil, donde no hay teclado) */
+  document.getElementById("navNext").addEventListener("click", function () {
+    if (body.classList.contains("overview")) toggleOverview(false);
+    next();
+  });
+  document.getElementById("navPrev").addEventListener("click", function () {
+    if (body.classList.contains("overview")) toggleOverview(false);
+    prev();
+  });
+
+  /* Navegación por swipe (un dedo, gesto horizontal). Se ignoran gestos que
+     nacen sobre enlaces/botones/campos o en bloques de código desplazables,
+     y la vista índice (allí el scroll vertical manda). */
+  var tsX = 0, tsY = 0, tsOK = false;
+  deck.addEventListener("touchstart", function (e) {
+    tsOK = false;
+    if (e.touches.length !== 1) return;
+    if (body.classList.contains("overview") || body.classList.contains("print-view")) return;
+    var t = e.target;
+    if (t && t.closest && t.closest("a,button,input,textarea,select,pre,.decknav,.fsbtn,.anno-fab,.anno-panel")) return;
+    tsX = e.touches[0].clientX;
+    tsY = e.touches[0].clientY;
+    tsOK = true;
+  }, { passive: true });
+  deck.addEventListener("touchend", function (e) {
+    if (!tsOK) return;
+    tsOK = false;
+    var dx = e.changedTouches[0].clientX - tsX;
+    var dy = e.changedTouches[0].clientY - tsY;
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+    if (dx < 0) next(); else prev();
+  }, { passive: true });
 
   deck.addEventListener("click", function (e) {
     if (!body.classList.contains("overview")) return;
