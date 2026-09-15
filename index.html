@@ -528,22 +528,159 @@ body.anno-review-open .anno-review-close{ display: block; }
       <h2>El backend monolítico hoy</h2>
     </div>
     <div class="slide__body">
-      <div class="media">
-        <div class="txt">
-          <ul class="bullets" style="font-size:22px">
-            <li>Un único proceso concentra <b>todos los dominios</b>: autenticación, sitios, evaluaciones, correos, foros…</li>
-            <li>Un controlador de <b class="accent">3.629 líneas</b> gestiona <b class="accent">18 dominios</b> de negocio</li>
-            <li>Sin pruebas automatizadas ni observabilidad</li>
-            <li>Despliegue manual, infraestructura <i>on-premise</i></li>
-          </ul>
-        </div>
-        <figure>
-          <div class="figure" style="min-height:340px"><img src="img/modelo-datos-monolito.png" alt="Modelo de datos del monolito"></div>
-          <figcaption>Fig. 1 · Modelo de datos del monolito: dominios acoplados referencialmente.</figcaption>
-        </figure>
+      <div class="txt">
+        <ul class="bullets" style="font-size:24px; max-width:900px">
+          <li>Un único proceso concentra <b>todos los dominios</b>: autenticación, sitios, evaluaciones, correos, foros…</li>
+          <li>Un controlador de <b class="accent">3.629 líneas</b> gestiona <b class="accent">18 dominios</b> de negocio</li>
+          <li>Un solo esquema de datos: <b class="accent">40 tablas</b> acopladas referencialmente (siguiente lámina)</li>
+          <li>Sin pruebas automatizadas ni observabilidad</li>
+          <li>Despliegue manual, infraestructura <i>on-premise</i></li>
+        </ul>
       </div>
     </div>
     <aside class="notes">El síntoma más claro: un solo controlador de 3.629 líneas atendiendo 18 dominios distintos. Cualquier cambio local puede romper funcionalidades aparentemente no relacionadas, y sin tests ni observabilidad cada modificación es un ejercicio de alto riesgo.</aside>
+  </section>
+
+
+  <!-- 7 · MODELO DE DATOS DEL MONOLITO (lámina completa) -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Problema</p>
+      <h2>Un solo esquema: 40 tablas, acoplamiento total</h2>
+    </div>
+    <div class="slide__body" style="justify-content:center">
+      <svg viewBox="0 0 1240 560" style="width:100%; height:auto; max-height:560px" role="img" aria-label="Modelo de datos del monolito: 40 tablas acopladas">
+    <defs>
+      <marker id="aU" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#008cba"/></marker>
+      <marker id="aC" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6f7b84"/></marker>
+      <marker id="aD" markerWidth="14" markerHeight="14" refX="12" refY="7" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L14,7 L0,14 z" fill="#d17d00"/></marker>
+      <marker id="aG" markerWidth="14" markerHeight="14" refX="12" refY="7" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L14,7 L0,14 z" fill="#43ac6a"/></marker>
+    </defs>
+
+    <!-- marcos de zona -->
+    <rect x="24" y="56" width="190" height="224" rx="8" fill="#008cba" opacity="0.07" stroke="#008cba" stroke-width="1.2" stroke-dasharray="5 3"/>
+    <rect x="274" y="56" width="190" height="224" rx="8" fill="#6f7b84" opacity="0.07" stroke="#6f7b84" stroke-width="1.2" stroke-dasharray="5 3"/>
+    <rect x="804" y="56" width="206" height="258" rx="8" fill="#e99002" opacity="0.08" stroke="#e99002" stroke-width="1.2" stroke-dasharray="5 3"/>
+    <rect x="1060" y="56" width="170" height="462" rx="8" fill="#43ac6a" opacity="0.08" stroke="#43ac6a" stroke-width="1.2" stroke-dasharray="5 3"/>
+
+    <!-- títulos de zona -->
+    <text x="28" y="46" font-size="12.5" font-weight="700" fill="#008cba">Jerarquía de usuario (6)</text>
+    <text x="278" y="46" font-size="12.5" font-weight="700" fill="#6f7b84">Catálogos y enlaces (6)</text>
+    <text x="524" y="46" font-size="12.5" font-weight="700" fill="#b96f00">Núcleo (1)</text>
+    <text x="808" y="46" font-size="12.5" font-weight="700" fill="#b96f00">Dependientes de site (13)</text>
+    <text x="1064" y="46" font-size="12.5" font-weight="700" fill="#43ac6a">Dependientes de 2.° nivel (13)</text>
+
+    <!-- flechas de acoplamiento -->
+    <path d="M214,90 C340,8 480,12 606,138" fill="none" stroke="#008cba" stroke-width="2.2" opacity="0.75" marker-end="url(#aU)"/>
+    <text x="330" y="30" font-size="11" font-weight="600" fill="#008cba">roles y enlaces N:M con usuario</text>
+    <path d="M466,170 C488,182 502,196 520,206" fill="none" stroke="#6f7b84" stroke-width="2.2" opacity="0.8" marker-end="url(#aC)"/>
+    <text x="468" y="252" font-size="10.5" font-weight="600" fill="#6f7b84">FK + N:M</text>
+    <path d="M726,222 C758,220 772,214 800,210" fill="none" stroke="#d17d00" stroke-width="13" opacity="0.28" marker-end="url(#aD)"/>
+    <text x="736" y="192" font-size="12.5" font-weight="800" fill="#b96f00">13 FK</text>
+    <path d="M1012,332 C1032,332 1044,332 1056,332" fill="none" stroke="#43ac6a" stroke-width="11" opacity="0.3" marker-end="url(#aG)"/>
+    <text x="1035" y="356" text-anchor="middle" font-size="11" font-weight="700" fill="#43ac6a">13 tablas</text>
+
+
+    <!-- chips -->
+    <rect x="30" y="72" width="178" height="26" rx="4" fill="#fff" stroke="#008cba" stroke-width="1.1"/>
+      <text x="119.0" y="88.6" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#222">user</text>
+      <rect x="30" y="106" width="178" height="26" rx="4" fill="#fff" stroke="#008cba" stroke-width="1.1"/>
+      <text x="119.0" y="122.6" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#222">user_profile</text>
+      <rect x="30" y="140" width="178" height="26" rx="4" fill="#fff" stroke="#008cba" stroke-width="1.1"/>
+      <text x="119.0" y="156.6" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#222">session</text>
+      <rect x="30" y="174" width="178" height="26" rx="4" fill="#fff" stroke="#008cba" stroke-width="1.1"/>
+      <text x="119.0" y="190.6" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#222">administrator</text>
+      <rect x="30" y="208" width="178" height="26" rx="4" fill="#fff" stroke="#008cba" stroke-width="1.1"/>
+      <text x="119.0" y="224.6" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#222">professor</text>
+      <rect x="30" y="242" width="178" height="26" rx="4" fill="#fff" stroke="#008cba" stroke-width="1.1"/>
+      <text x="119.0" y="258.6" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#222">student</text>
+    <rect x="280" y="72" width="178" height="26" rx="4" fill="#fff" stroke="#6f7b84" stroke-width="1.1"/>
+      <text x="369.0" y="88.6" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#222">course</text>
+      <rect x="280" y="106" width="178" height="26" rx="4" fill="#fff" stroke="#6f7b84" stroke-width="1.1"/>
+      <text x="369.0" y="122.6" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#222">career</text>
+      <rect x="280" y="140" width="178" height="26" rx="4" fill="#fff" stroke="#6f7b84" stroke-width="1.1"/>
+      <text x="369.0" y="156.6" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#222">semester</text>
+      <rect x="280" y="174" width="178" height="26" rx="4" fill="#fff" stroke="#6f7b84" stroke-width="1.1"/>
+      <text x="369.0" y="190.6" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#222">classification</text>
+      <rect x="280" y="208" width="178" height="26" rx="4" fill="#fff" stroke="#6f7b84" stroke-width="1.1" stroke-dasharray="4 2"/>
+      <text x="369.0" y="224.6" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#222">course_career</text>
+      <rect x="280" y="242" width="178" height="26" rx="4" fill="#fff" stroke="#6f7b84" stroke-width="1.1" stroke-dasharray="4 2"/>
+      <text x="369.0" y="258.6" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#222">course_classification</text>
+    <rect x="810" y="72" width="96" height="26" rx="4" fill="#fff" stroke="#e99002" stroke-width="1.1"/>
+      <text x="858.0" y="88.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">section</text>
+      <rect x="810" y="106" width="96" height="26" rx="4" fill="#fff" stroke="#e99002" stroke-width="1.1"/>
+      <text x="858.0" y="122.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">schedule</text>
+      <rect x="810" y="140" width="96" height="26" rx="4" fill="#fff" stroke="#e99002" stroke-width="1.1"/>
+      <text x="858.0" y="156.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">evaluation</text>
+      <rect x="810" y="174" width="96" height="26" rx="4" fill="#fff" stroke="#e99002" stroke-width="1.1"/>
+      <text x="858.0" y="190.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">objective</text>
+      <rect x="810" y="208" width="96" height="26" rx="4" fill="#fff" stroke="#e99002" stroke-width="1.1"/>
+      <text x="858.0" y="224.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">thematic_content</text>
+      <rect x="810" y="242" width="96" height="26" rx="4" fill="#fff" stroke="#e99002" stroke-width="1.1"/>
+      <text x="858.0" y="258.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">bibliography</text>
+      <rect x="810" y="276" width="96" height="26" rx="4" fill="#fff" stroke="#e99002" stroke-width="1.1"/>
+      <text x="858.0" y="292.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">planification</text>
+    <rect x="910" y="72" width="96" height="26" rx="4" fill="#fff" stroke="#e99002" stroke-width="1.1"/>
+      <text x="958.0" y="88.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">notice</text>
+      <rect x="910" y="106" width="96" height="26" rx="4" fill="#fff" stroke="#e99002" stroke-width="1.1"/>
+      <text x="958.0" y="122.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">forum</text>
+      <rect x="910" y="140" width="96" height="26" rx="4" fill="#fff" stroke="#e99002" stroke-width="1.1"/>
+      <text x="958.0" y="156.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">site_config</text>
+      <rect x="910" y="174" width="96" height="26" rx="4" fill="#fff" stroke="#e99002" stroke-width="1.1"/>
+      <text x="958.0" y="190.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">log_site</text>
+      <rect x="910" y="208" width="96" height="26" rx="4" fill="#fff" stroke="#e99002" stroke-width="1.1" stroke-dasharray="4 2"/>
+      <text x="958.0" y="224.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">professor_site</text>
+      <rect x="910" y="242" width="96" height="26" rx="4" fill="#fff" stroke="#e99002" stroke-width="1.1" stroke-dasharray="4 2"/>
+      <text x="958.0" y="258.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">student_site</text>
+      <rect x="910" y="276" width="96" height="26" rx="4" fill="#fff" stroke="#e99002" stroke-width="1.1" stroke-dasharray="4 2"/>
+      <text x="958.0" y="292.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">student_teacher</text>
+    <rect x="1066" y="72" width="158" height="26" rx="4" fill="#fff" stroke="#43ac6a" stroke-width="1.1"/>
+      <text x="1145.0" y="88.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">assignment</text>
+      <rect x="1066" y="106" width="158" height="26" rx="4" fill="#fff" stroke="#43ac6a" stroke-width="1.1"/>
+      <text x="1145.0" y="122.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">assignment_file</text>
+      <rect x="1066" y="140" width="158" height="26" rx="4" fill="#fff" stroke="#43ac6a" stroke-width="1.1"/>
+      <text x="1145.0" y="156.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">grade</text>
+      <rect x="1066" y="174" width="158" height="26" rx="4" fill="#fff" stroke="#43ac6a" stroke-width="1.1"/>
+      <text x="1145.0" y="190.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">comment</text>
+      <rect x="1066" y="208" width="158" height="26" rx="4" fill="#fff" stroke="#43ac6a" stroke-width="1.1"/>
+      <text x="1145.0" y="224.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">file</text>
+      <rect x="1066" y="242" width="158" height="26" rx="4" fill="#fff" stroke="#43ac6a" stroke-width="1.1"/>
+      <text x="1145.0" y="258.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">video</text>
+      <rect x="1066" y="276" width="158" height="26" rx="4" fill="#fff" stroke="#43ac6a" stroke-width="1.1"/>
+      <text x="1145.0" y="292.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">link</text>
+      <rect x="1066" y="310" width="158" height="26" rx="4" fill="#fff" stroke="#43ac6a" stroke-width="1.1"/>
+      <text x="1145.0" y="326.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">log</text>
+      <rect x="1066" y="344" width="158" height="26" rx="4" fill="#fff" stroke="#43ac6a" stroke-width="1.1"/>
+      <text x="1145.0" y="360.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">surveys</text>
+      <rect x="1066" y="378" width="158" height="26" rx="4" fill="#fff" stroke="#43ac6a" stroke-width="1.1"/>
+      <text x="1145.0" y="394.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">survey_questions</text>
+      <rect x="1066" y="412" width="158" height="26" rx="4" fill="#fff" stroke="#43ac6a" stroke-width="1.1"/>
+      <text x="1145.0" y="428.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">survey_question_choices</text>
+      <rect x="1066" y="446" width="158" height="26" rx="4" fill="#fff" stroke="#43ac6a" stroke-width="1.1"/>
+      <text x="1145.0" y="462.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">student_surveys</text>
+      <rect x="1066" y="480" width="158" height="26" rx="4" fill="#fff" stroke="#43ac6a" stroke-width="1.1"/>
+      <text x="1145.0" y="496.6" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#222">student_survey_answers</text>
+
+    <!-- núcleo -->
+    <rect x="524" y="140" width="200" height="170" rx="10" fill="#e99002" stroke="#b96f00" stroke-width="2"/>
+    <text x="624" y="212" text-anchor="middle" font-family="monospace" font-size="26" font-weight="700" fill="#fff">site</text>
+    <text x="624" y="236" text-anchor="middle" font-size="11.5" fill="#fff" opacity="0.95">núcleo del monolito</text>
+    <rect x="544" y="254" width="160" height="30" rx="15" fill="#fff" opacity="0.94"/>
+    <text x="624" y="274" text-anchor="middle" font-size="12" font-weight="700" fill="#b96f00">18 FK directas</text>
+
+    <!-- leyenda -->
+    <g font-size="11.5" fill="#222">
+      <rect x="30" y="534" width="12" height="12" fill="#e99002" stroke="#b96f00"/><text x="48" y="544">Núcleo</text>
+      <rect x="120" y="534" width="12" height="12" fill="#008cba"/><text x="138" y="544">Usuario</text>
+      <rect x="214" y="534" width="12" height="12" fill="#6f7b84"/><text x="232" y="544">Catálogos</text>
+      <rect x="322" y="534" width="12" height="12" fill="#e99002" opacity="0.45"/><text x="340" y="544">Dependientes</text>
+      <rect x="452" y="534" width="12" height="12" fill="#43ac6a"/><text x="470" y="544">2.° nivel</text>
+      <rect x="556" y="534" width="16" height="12" fill="#fff" stroke="#e99002" stroke-dasharray="4 2"/><text x="578" y="544">enlace N:M</text>
+      <text x="1230" y="545" text-anchor="end" font-size="13" font-weight="800" fill="#c0392b">40 tablas · un solo esquema compartido</text>
+    </g>
+  </svg>
+    </div>
+    <aside class="notes">Este es el corazón del argumento: cuarenta tablas en un solo esquema, donde trece cuelgan directamente de site con dieciocho llaves foráneas; usuario se conecta por enlaces N a M, y otras trece cuelgan de las anteriores. Un cambio de esquema en site es una cirugía a corazón abierto sin tests ni red de seguridad. Cuando pregunten por qué no simplemente refactorizar el monolito, esta lámina es la respuesta: el acoplamiento es estructural, no de estilo.</aside>
   </section>
 
   <!-- 7 · PROBLEMA HUMANO -->
