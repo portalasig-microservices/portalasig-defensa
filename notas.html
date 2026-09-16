@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notas del orador · Defensa PortalAsig</title>
+<style>
+  :root{ --accent:#008cba; --ink:#222; --muted:#6f7b84; --soft:#ecf5f9; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; color:var(--ink); background:#f7fafc; line-height:1.55; }
+  header { position:sticky; top:0; background:var(--accent); color:#fff; padding:14px 18px; z-index:10; box-shadow:0 2px 8px rgba(0,0,0,.15); }
+  header h1 { font-size:18px; }
+  header p { font-size:12px; opacity:.9; }
+  header a { color:#fff; font-weight:700; text-decoration:none; font-size:12px; border:1.5px solid #fff; border-radius:14px; padding:2px 10px; margin-left:8px; }
+  nav { background:#fff; padding:14px 18px; border-bottom:1px solid #dde7ec; }
+  nav strong { font-size:13px; color:var(--muted); display:block; margin-bottom:8px; }
+  nav .toc { display:flex; flex-wrap:wrap; gap:6px; }
+  nav a { font-size:12.5px; color:var(--accent); text-decoration:none; background:var(--soft); border-radius:12px; padding:3px 9px; }
+  main { max-width:760px; margin:0 auto; padding:16px 14px 60px; }
+  article { background:#fff; border-radius:10px; padding:16px 18px; margin-bottom:14px; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+  article h2 { font-size:16px; margin-bottom:8px; display:flex; gap:10px; align-items:baseline; }
+  .num { background:var(--accent); color:#fff; font-size:12px; font-weight:800; border-radius:12px; padding:2px 9px; flex-shrink:0; }
+  article p { font-size:15.5px; }
+  .top { display:inline-block; margin-top:10px; font-size:12px; color:var(--muted); text-decoration:none; }
+  footer { text-align:center; color:var(--muted); font-size:12px; padding:20px; }
+</style>
+</head>
+<body id="top">
+<header>
+  <h1>🎤 Notas del orador — Defensa PortalAsig<a href="./">← láminas</a></h1>
+  <p>43 láminas · actualizado al último deploy</p>
+</header>
+<nav>
+  <strong>Ir a la lámina:</strong>
+  <div class="toc"><a href="#s1">1. Diseño e implementación de un modelo de mantenimiento asistido por inteligencia artificial para una arquitectura de microservicios en el sistema PortalAsig</a>
+<a href="#s2">2. Contenido de la presentación</a>
+<a href="#s3">3. (sección / portada)</a>
+<a href="#s4">4. Contexto y problema</a>
+<a href="#s5">5. PortalAsig: una década de evolución</a>
+<a href="#s6">6. El backend monolítico hoy</a>
+<a href="#s7">7. Un solo esquema: 40 tablas, acoplamiento total</a>
+<a href="#s8">8. …pero el problema de fondo es humano</a>
+<a href="#s9">9. Objetivo general y específicos</a>
+<a href="#s10">10. Tres líneas de transformación</a>
+<a href="#s11">11. Marco conceptual</a>
+<a href="#s12">12. De monolito a microservicios</a>
+<a href="#s13">13. Ingeniería de mantenimiento de software</a>
+<a href="#s14">14. Computación autonómica: el ciclo MAPE-K</a>
+<a href="#s15">15. Stack tecnológico seleccionado</a>
+<a href="#s16">16. Solución</a>
+<a href="#s17">17. Arquitectura general del ecosistema</a>
+<a href="#s18">18. Descomposición en dominios acotados</a>
+<a href="#s19">19. Database per service</a>
+<a href="#s20">20. La calidad deja de depender del conocimiento tácito</a>
+<a href="#s21">21. Esquema versionado con Flyway</a>
+<a href="#s22">22. El frontend heredado se adapta, no se reescribe</a>
+<a href="#s23">23. Autenticación OAuth2/JWT de extremo a extremo</a>
+<a href="#s24">24. PAIMA: PortalAsig Intelligent MAPE-K</a>
+<a href="#s25">25. PAIMA por dentro: el ciclo MAPE-K en clases</a>
+<a href="#s26">26. Operación pensada para quien llega “en frío”</a>
+<a href="#s27">27. El panel de PAIMA en operación real</a>
+<a href="#s28">28. IA que propone, humano que decide</a>
+<a href="#s29">29. Validación y resultados</a>
+<a href="#s30">30. Estrategia de pruebas en cuatro dimensiones</a>
+<a href="#s31">31. Cobertura medida y exigida automáticamente</a>
+<a href="#s32">32. Flujos de usuario validados con Cypress</a>
+<a href="#s33">33. Benchmarking con k6</a>
+<a href="#s34">34. Simulación de caos: caída de un servicio</a>
+<a href="#s35">35. La evidencia del experimento</a>
+<a href="#s36">36. Análisis comparativo global</a>
+<a href="#s37">37. Lo que quedó demostrado</a>
+<a href="#s38">38. Conclusiones</a>
+<a href="#s39">39. Tres transformaciones interdependientes</a>
+<a href="#s40">40. Limitantes y aspectos a mejorar</a>
+<a href="#s41">41. Líneas de evolución identificadas</a>
+<a href="#s42">42. (sección / portada)</a>
+<a href="#s43">43. ¡Gracias!</a></div>
+</nav>
+<main>
+<article id="s1">
+  <h2><span class="num">1</span> Diseño e implementación de un modelo de mantenimiento asistido por inteligencia artificial para una arquitectura de microservicios en el sistema PortalAsig</h2>
+  <p>Buenos días. Agradezco al jurado su tiempo. Voy a presentar el trabajo: un modelo de mantenimiento asistido por IA sobre una arquitectura de microservicios para PortalAsig, el portal académico de la Facultad de Ciencias.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s2">
+  <h2><span class="num">2</span> Contenido de la presentación</h2>
+  <p>Presento la ruta: del problema a la solución y sus pruebas. Iré directo a lo que hice y lo que demostré; el marco teórico lo sintetizo porque ya está en el documento.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s3">
+  <h2><span class="num">3</span> (sección / portada)</h2>
+  <p>Antes de hablar de tecnología, quiero que retengan esto: PortalAsig lo mantienen estudiantes de TEG, seminario o servicio comunitario, que rotan cada uno o dos semestres. Todo el diseño que verán responde a esa realidad humana, no solo a una moda técnica.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s4">
+  <h2><span class="num">4</span> Contexto y problema</h2>
+  <p>—</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s5">
+  <h2><span class="num">5</span> PortalAsig: una década de evolución</h2>
+  <p>PortalAsig 2 nació en 2016 como monolito Node, sucesor de un primer portal más simple —por eso la base de datos y la URL de producción se llaman literalmente portalasig2 hasta hoy; si el jurado pregunta &quot;¿y el 1?&quot;, esa es la respuesta. En 2020 se modernizó solo el frontend a Vue —ese TEG demostró que un rediseño bien planificado extiende la vida del sistema—. El backend quedó seis años acumulando deuda. Ahí entra este trabajo.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s6">
+  <h2><span class="num">6</span> El backend monolítico hoy</h2>
+  <p>El síntoma más claro: un solo controlador de 3.629 líneas atendiendo 18 dominios distintos. Cualquier cambio local puede romper funcionalidades aparentemente no relacionadas, y sin tests ni observabilidad cada modificación es un ejercicio de alto riesgo.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s7">
+  <h2><span class="num">7</span> Un solo esquema: 40 tablas, acoplamiento total</h2>
+  <p>Este es el corazón del argumento: cuarenta tablas en un solo esquema, donde trece cuelgan directamente de site con dieciocho llaves foráneas; usuario se conecta por enlaces N a M, y otras trece cuelgan de las anteriores. Un cambio de esquema en site es una cirugía a corazón abierto sin tests ni red de seguridad. Cuando pregunten por qué no simplemente refactorizar el monolito, esta lámina es la respuesta: el acoplamiento es estructural, no de estilo.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s8">
+  <h2><span class="num">8</span> …pero el problema de fondo es humano</h2>
+  <p>Tres fuerzas se combinan: la deuda crece, el conocimiento se va con cada colaborador, y no hay equipo permanente de operaciones. Por eso la solución no puede ser solo &quot;mover a microservicios&quot;: debe hacer el sistema mantenible por gente que llega en frío.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s9">
+  <h2><span class="num">9</span> Objetivo general y específicos</h2>
+  <p>El objetivo general tiene tres patas: migrar el backend, adaptar el frontend y sistematizar el mantenimiento con ayuda de IA. Los siete específicos —que iré revelando— cubren desde la documentación del sistema actual hasta la evaluación experimental.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s10">
+  <h2><span class="num">10</span> Tres líneas de transformación</h2>
+  <p>Esta lámina es el mapa de toda la solución: backend descompuesto, frontend adaptado, y PAIMA como capa de autogestión. Transversal a todo: calidad y observabilidad sistemáticas. Ahora, tres conceptos del marco teórico y entro a la solución.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s11">
+  <h2><span class="num">11</span> Marco conceptual</h2>
+  <p>—</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s12">
+  <h2><span class="num">12</span> De monolito a microservicios</h2>
+  <p>La comparación clásica, pero enfatizo el costo: los microservicios no son gratis —multiplican procesos, bases de datos y puntos que vigilar—. Ese costo operativo es precisamente lo que motiva la segunda mitad del trabajo: la autogestión.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s13">
+  <h2><span class="num">13</span> Ingeniería de mantenimiento de software</h2>
+  <p>El mantenimiento no es solo arreglar bugs: la norma ISO 14764 lo clasifica en correctivo, adaptativo, perfectivo y preventivo. El monolito solo recibía —a duras penas— los dos primeros; mi trabajo lo dota de mantenimiento preventivo sistemático: integración continua que valida cada cambio, cobertura con umbral que bloquea la fusión, esquema versionado con Flyway y observabilidad. Es la respuesta directa al problema humano: el sistema se vuelve mantenible por gente que llega en frío, porque la calidad la impone el proceso y no la memoria de nadie.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s14">
+  <h2><span class="num">14</span> Computación autonómica: el ciclo MAPE-K</h2>
+  <p>MAPE-K es el ciclo de control estándar de la computación autonómica: monitorear, analizar, planificar, ejecutar, con conocimiento compartido. La tendencia actual —que sigo de Esposito et al.— es delegar el análisis y la planificación en IA. PAIMA es exactamente eso, aplicado a PortalAsig.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s15">
+  <h2><span class="num">15</span> Stack tecnológico seleccionado</h2>
+  <p>Criterio rector: tecnologías maduras y con comunidad amplia, porque un colaborador temporal debe encontrar documentación y ejemplos sin fricción. Todo corre on-premise con Docker Compose; nada exige nube.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s16">
+  <h2><span class="num">16</span> Solución</h2>
+  <p>—</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s17">
+  <h2><span class="num">17</span> Arquitectura general del ecosistema</h2>
+  <p>La lámina central de la defensa. El frontend Vue habla con cada servicio a través del proxy Nginx. El Config Server centraliza el bootstrap de los cuatro servicios. Cada microservicio tiene su propia base MySQL —database per service— y los eventos de dominio fluyen por Kafka hacia Notify. Todo el ecosistema expone métricas y logs que Prometheus y Loki recolectan y Grafana visualiza; y de ahí se alimenta PAIMA, que además consulta al proveedor LLM y ordena los correos de alerta a través de Notify.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s18">
+  <h2><span class="num">18</span> Descomposición en dominios acotados</h2>
+  <p>Tres dominios de negocio —identidad, núcleo académico y notificaciones— más PAIMA como servicio de autogestión. La descomposición elimina el acoplamiento referencial del modelo monolítico: la caída de un servicio ya no compromete al resto.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s19">
+  <h2><span class="num">19</span> Database per service</h2>
+  <p>A la izquierda, el esquema del monolito: tablas de todos los dominios entrelazadas. A la derecha, el modelo distribuido: UAA, Site y Notify poseen sus datos. Esto habilita despliegues y migraciones independientes por servicio.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s20">
+  <h2><span class="num">20</span> La calidad deja de depender del conocimiento tácito</h2>
+  <p>Esta es la técnica de mantenimiento más importante para el problema humano: la validación ya no vive en la cabeza de nadie. Cada pull request ejecuta estilo, pruebas contra bases de datos reales y cobertura; si algo falla, GitHub bloquea la fusión.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s21">
+  <h2><span class="num">21</span> Esquema versionado con Flyway</h2>
+  <p>Las bases de datos también quedan bajo control de versiones: migraciones SQL incrementales con convención de nombres. El siguiente estudiante reconstruye cualquier esquema ejecutando las migraciones, sin preguntarle a nadie.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s22">
+  <h2><span class="num">22</span> El frontend heredado se adapta, no se reescribe</h2>
+  <p>Del lado del cliente no se reescribió nada: se reestructuró. El store Vuex quedó por dominios, los guards manejan siete niveles de permiso y hay un cliente Axios por microservicio. La autenticación pasó de propietaria a OAuth2 estándar —siguiente lámina.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s23">
+  <h2><span class="num">23</span> Autenticación OAuth2/JWT de extremo a extremo</h2>
+  <p>El servicio UAA emite tokens JWT: uno de aplicación para que el frontend exista como cliente, y uno de usuario con refresh tras el login. El flujo completo está cubierto por pruebas end-to-end.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s24">
+  <h2><span class="num">24</span> PAIMA: PortalAsig Intelligent MAPE-K</h2>
+  <p>PAIMA es el aporte central del trabajo: una aplicación práctica del ciclo MAPE-K con IA. No exige infraestructura nueva: consume lo que ya recolecta la observabilidad. La IA analiza y propone, pero hay dos salvaguardas: fallback determinista si el proveedor de IA no está disponible, y aprobación humana obligatoria.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s25">
+  <h2><span class="num">25</span> PAIMA por dentro: el ciclo MAPE-K en clases</h2>
+  <p>La arquitectura interna sigue literalmente el ciclo: el Scheduler dispara cada cinco minutos al MapeLoopService, que coordina las cuatro fases. Monitor recolecta de Prometheus y Loki y arma snapshots; Analyze y Plan pasan por un planner que delega en una interfaz de proveedor con tres estrategias —Kimi/OpenAI-compatible, Ollama local y un fallback determinista basado en reglas—; Execute corre las acciones aprobadas con whitelist y notifica por correo vía ms-notify; y Knowledge persiste alertas y feedback en su propia base, que retroalimenta el ciclo. Arriba a la izquierda, los tres controladores REST que expone al frontend.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s26">
+  <h2><span class="num">26</span> Operación pensada para quien llega “en frío”</h2>
+  <p>El panel consolida lo esencial: qué servicios están sanos, qué incidentes hay abiertos y dónde mirar. Un estudiante que recibe el proyecto por primera vez puede orientarse sin una transferencia de conocimiento previa.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s27">
+  <h2><span class="num">27</span> El panel de PAIMA en operación real</h2>
+  <p>El panel real, sin maquetas: a la izquierda la salud de cada servicio, el semáforo de la última corrida del ciclo y las acciones pendientes; a la derecha el detalle del incidente P1 con la recomendación textual de la IA. Dato curioso para la defensa: la recomendación que se ve aquí —permitir acceso anónimo al actuator de salud— es literalmente el fix que aplicamos después al alinear la configuración de seguridad de ms-site con la de UAA y Notify.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s28">
+  <h2><span class="num">28</span> IA que propone, humano que decide</h2>
+  <p>El flujo de trabajo con la IA es conversacional: el operador pregunta, la IA explica el diagnóstico y propone —por ejemplo, reiniciar un servicio— pero la ejecución requiere el clic de aprobación. La autonomía tiene supervisión.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s29">
+  <h2><span class="num">29</span> Validación y resultados</h2>
+  <p>—</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s30">
+  <h2><span class="num">30</span> Estrategia de pruebas en cuatro dimensiones</h2>
+  <p>La evaluación no fue una sola prueba: cuatro dimensiones con herramientas y criterios objetivos cada una. Las dos primeras miden calidad de código y de flujos; las dos últimas miden el comportamiento de la arquitectura bajo carga y bajo fallos.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s31">
+  <h2><span class="num">31</span> Cobertura medida y exigida automáticamente</h2>
+  <p>El contraste es cualitativo: el monolito no tenía ni una prueba; hoy cada servicio mide entre 80,5 y 91,8 por ciento de líneas —UAA 84,6, Site 80,5, Notify 91,8, PAIMA 85,5— y si un PR baja del umbral, la fusión se bloquea sola. Aclaración por si preguntan el 70/60: no es el porcentaje del código añadido en el PR, es el piso mínimo de cobertura TOTAL del servicio —setenta por ciento de líneas y sesenta por ciento de ramas, medido en cada PR—; las ramas son más exigentes porque un if probado solo por el camino verdadero suma líneas pero no ramas, por eso su umbral es menor. Los tests son de integración contra MySQL real con Testcontainers, no H2; escribirlos destapó 11 bugs reales antes de producción.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s32">
+  <h2><span class="num">32</span> Flujos de usuario validados con Cypress</h2>
+  <p>Doce specs con cincuenta y dos casos simulan al usuario real contra el stack sembrado con datos anonimizados: autenticación OAuth, flujos de sitios, administración, PAIMA. Corren en 1 minuto 16 segundos y 18 de cada 20 corridas salen cien por ciento verdes —los dos fallos fueron del screenshot del navegador, no de aserciones. La suite incluso descubrió un bug real: evaluaciones sembradas con un tipo inexistente que devolvía 500.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s33">
+  <h2><span class="num">33</span> Benchmarking con k6</h2>
+  <p>Resultado del benchmark: lectura 1,9 veces más rápida y casi el doble de throughput; escritura empatada pero con cero errores —el legacy devuelve 500 ante duplicados, el MS responde 200 idempotente—; y la autenticación es más lenta a propósito: bcrypt cuesta unas 5 veces más CPU que el MD5 del legacy, y ese costo queda aislado en UAA, que escala por sí solo. Cero fallas de plataforma en más de 390 mil peticiones. La limitación declarada: entorno controlado local, no producción.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s34">
+  <h2><span class="num">34</span> Simulación de caos: caída de un servicio</h2>
+  <p>El experimento clave: matamos ms-site a propósito, tres iteraciones. Dos cosas se demuestran a la vez: el aislamiento de fallos —el resto del ecosistema siguió vivo— y el ciclo completo de PAIMA con tiempos medidos: detección en un solo ciclo MAPE de unos dos minutos —peor caso cuatro minutos cincuenta y nueve segundos por la ventana del scheduler de cinco minutos—, correo P1 con diagnóstico de la IA, y recuperación en unos veinte segundos tras la aprobación humana.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s35">
+  <h2><span class="num">35</span> La evidencia del experimento</h2>
+  <p>La evidencia concreta: a la izquierda el correo que PAIMA autogenera al detectar la falla —asunto P1, diagnóstico de la IA, acción sugerida y enlace al panel—; a la derecha el detalle de la incidencia con su clasificación y contexto. La intervención humana se limitó a evaluar y aprobar; la acción ejecutada quedó auditada con actor y comentario.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s36">
+  <h2><span class="num">36</span> Análisis comparativo global</h2>
+  <p>La tabla resume el trabajo: en cada dimensión evaluada, el ecosistema no solo supera al monolito —cambia la naturaleza del mantenimiento, de artesanal y tácito a sistemático y reproducible.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s37">
+  <h2><span class="num">37</span> Lo que quedó demostrado</h2>
+  <p>Cuatro afirmaciones, cada una respaldada por un experimento del capítulo 4. Con esto paso a las conclusiones.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s38">
+  <h2><span class="num">38</span> Conclusiones</h2>
+  <p>—</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s39">
+  <h2><span class="num">39</span> Tres transformaciones interdependientes</h2>
+  <p>Las conclusiones se organizan en tres transformaciones: la arquitectónica —desacoplar—, la metodológica —validar todo cambio— y la operativa —delegar el diagnóstico en un ciclo autónomo supervisado—. El aporte es una aplicación real y medida de MAPE-K con IA en un contexto académico con restricciones duras: on-premise, recursos limitados y mantenedores rotativos.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s40">
+  <h2><span class="num">40</span> Limitantes y aspectos a mejorar</h2>
+  <p>Declaro las limitaciones antes de que me las pregunten: la periodicidad del ciclo, la dependencia del proveedor de IA, el benchmark ejecutado en entorno local controlado —aunque con idénticos recursos para ambas arquitecturas, lo que sí garantiza la comparación término a término—. Ninguna invalida los resultados; delimitan su alcance.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s41">
+  <h2><span class="num">41</span> Líneas de evolución identificadas</h2>
+  <p>Las líneas de evolución nacen de las propias limitaciones: gateway centralizado, IA local especializada para no depender de proveedores externos, PAIMA más integrado al ciclo de desarrollo, Vue 3, y la migración de los datos históricos que quedó fuera de alcance.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s42">
+  <h2><span class="num">42</span> (sección / portada)</h2>
+  <p>Vuelvo al problema del inicio: la rotación de colaboradores. Lo que hoy existe es un sistema que se explica a sí mismo —con pruebas, observabilidad y un asistente— precisamente para que el conocimiento no dependa de personas que rotan. Ese es el aporte.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s43">
+  <h2><span class="num">43</span> ¡Gracias!</h2>
+  <p>Cierro retomando la frase anterior y abro el espacio de preguntas. Posibles preguntas a preparar: por qué Spring Boot, por qué no API Gateway, cómo escala PAIMA a más servicios, qué pasa si la IA se equivoca (fallback + aprobación humana).</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+</main>
+<footer>Mantenimiento asistido por IA en arquitectura de microservicios · PortalAsig — TEG</footer>
+</body>
+</html>
