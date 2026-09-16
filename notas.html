@@ -34,12 +34,12 @@
   <strong>Ir a la lámina:</strong>
   <div class="toc"><a href="#s1">1. Diseño e implementación de un modelo de mantenimiento asistido por inteligencia artificial para una arquitectura de microservicios en el sistema PortalAsig</a>
 <a href="#s2">2. Contenido de la presentación</a>
-<a href="#s3">3. (sección / portada)</a>
-<a href="#s4">4. Contexto y problema</a>
-<a href="#s5">5. PortalAsig: una década de evolución</a>
-<a href="#s6">6. El backend monolítico hoy</a>
-<a href="#s7">7. Un solo esquema: 40 tablas, acoplamiento total</a>
-<a href="#s8">8. …pero el problema de fondo es humano</a>
+<a href="#s3">3. Contexto y problema</a>
+<a href="#s4">4. PortalAsig: una década de evolución</a>
+<a href="#s5">5. El backend monolítico hoy</a>
+<a href="#s6">6. Un solo esquema: 40 tablas, acoplamiento total</a>
+<a href="#s7">7. …pero el problema de fondo es humano</a>
+<a href="#s8">8. (sección / portada)</a>
 <a href="#s9">9. Objetivo general y específicos</a>
 <a href="#s10">10. Tres líneas de transformación</a>
 <a href="#s11">11. Marco conceptual</a>
@@ -88,33 +88,33 @@
   <a class="top" href="#top">↑ índice</a>
 </article>
 <article id="s3">
-  <h2><span class="num">3</span> (sección / portada)</h2>
-  <p>Antes de hablar de tecnología, quiero que retengan esto: PortalAsig lo mantienen estudiantes de TEG, seminario o servicio comunitario, que rotan cada uno o dos semestres. Todo el diseño que verán responde a esa realidad humana, no solo a una moda técnica.</p>
-  <a class="top" href="#top">↑ índice</a>
-</article>
-<article id="s4">
-  <h2><span class="num">4</span> Contexto y problema</h2>
+  <h2><span class="num">3</span> Contexto y problema</h2>
   <p>—</p>
   <a class="top" href="#top">↑ índice</a>
 </article>
-<article id="s5">
-  <h2><span class="num">5</span> PortalAsig: una década de evolución</h2>
+<article id="s4">
+  <h2><span class="num">4</span> PortalAsig: una década de evolución</h2>
   <p>PortalAsig 2 nació en 2016 como monolito Node, sucesor de un primer portal más simple —por eso la base de datos y la URL de producción se llaman literalmente portalasig2 hasta hoy; si el jurado pregunta &quot;¿y el 1?&quot;, esa es la respuesta. En 2020 se modernizó solo el frontend a Vue —ese TEG demostró que un rediseño bien planificado extiende la vida del sistema—. El backend quedó seis años acumulando deuda. Ahí entra este trabajo.</p>
   <a class="top" href="#top">↑ índice</a>
 </article>
-<article id="s6">
-  <h2><span class="num">6</span> El backend monolítico hoy</h2>
+<article id="s5">
+  <h2><span class="num">5</span> El backend monolítico hoy</h2>
   <p>El síntoma más claro: un solo controlador de 3.629 líneas atendiendo 18 dominios distintos. Cualquier cambio local puede romper funcionalidades aparentemente no relacionadas, y sin tests ni observabilidad cada modificación es un ejercicio de alto riesgo.</p>
   <a class="top" href="#top">↑ índice</a>
 </article>
-<article id="s7">
-  <h2><span class="num">7</span> Un solo esquema: 40 tablas, acoplamiento total</h2>
+<article id="s6">
+  <h2><span class="num">6</span> Un solo esquema: 40 tablas, acoplamiento total</h2>
   <p>Este es el corazón del argumento: cuarenta tablas en un solo esquema, donde trece cuelgan directamente de site con dieciocho llaves foráneas; usuario se conecta por enlaces N a M, y otras trece cuelgan de las anteriores. Un cambio de esquema en site es una cirugía a corazón abierto sin tests ni red de seguridad. Cuando pregunten por qué no simplemente refactorizar el monolito, esta lámina es la respuesta: el acoplamiento es estructural, no de estilo.</p>
   <a class="top" href="#top">↑ índice</a>
 </article>
-<article id="s8">
-  <h2><span class="num">8</span> …pero el problema de fondo es humano</h2>
+<article id="s7">
+  <h2><span class="num">7</span> …pero el problema de fondo es humano</h2>
   <p>Tres fuerzas se combinan: la deuda crece, el conocimiento se va con cada colaborador, y no hay equipo permanente de operaciones. Por eso la solución no puede ser solo &quot;mover a microservicios&quot;: debe hacer el sistema mantenible por gente que llega en frío.</p>
+  <a class="top" href="#top">↑ índice</a>
+</article>
+<article id="s8">
+  <h2><span class="num">8</span> (sección / portada)</h2>
+  <p>Antes de hablar de tecnología, quiero que retengan esto: PortalAsig lo mantienen estudiantes de TEG, seminario o servicio comunitario, que rotan cada uno o dos semestres. Todo el diseño que verán responde a esa realidad humana, no solo a una moda técnica.</p>
   <a class="top" href="#top">↑ índice</a>
 </article>
 <article id="s9">
@@ -159,7 +159,7 @@
 </article>
 <article id="s17">
   <h2><span class="num">17</span> Arquitectura general del ecosistema</h2>
-  <p>La lámina central de la defensa. El frontend Vue habla con cada servicio a través del proxy Nginx. El Config Server centraliza el bootstrap de los cuatro servicios. Cada microservicio tiene su propia base MySQL —database per service— y los eventos de dominio fluyen por Kafka hacia Notify. Todo el ecosistema expone métricas y logs que Prometheus y Loki recolectan y Grafana visualiza; y de ahí se alimenta PAIMA, que además consulta al proveedor LLM y ordena los correos de alerta a través de Notify.</p>
+  <p>La lámina central de la defensa. Dos repasos por si preguntan: un PROXY INVERSO recibe las peticiones del cliente y las redirige internamente al servicio que corresponde —el frontend nunca habla directo con los puertos de cada contenedor, y el proxy termina TLS y enruta por path—. Y OAUTH2/JWT: el frontend primero obtiene un token de aplicación con client_credentials para existir como cliente, y tras el login lo intercambia por un token de usuario firmado (JWT) con refresh; cada microservicio valida la firma localmente, sin llamar a UAA en cada petición. El frontend Vue habla con cada servicio a través del proxy Nginx. El Config Server centraliza el bootstrap de los cuatro servicios. Cada microservicio tiene su propia base MySQL —database per service— y los eventos de dominio fluyen por Kafka hacia Notify. Todo el ecosistema expone métricas y logs que Prometheus y Loki recolectan y Grafana visualiza; y de ahí se alimenta PAIMA, que además consulta al proveedor LLM y ordena los correos de alerta a través de Notify.</p>
   <a class="top" href="#top">↑ índice</a>
 </article>
 <article id="s18">
@@ -189,12 +189,12 @@
 </article>
 <article id="s23">
   <h2><span class="num">23</span> Autenticación OAuth2/JWT de extremo a extremo</h2>
-  <p>El servicio UAA emite tokens JWT: uno de aplicación para que el frontend exista como cliente, y uno de usuario con refresh tras el login. El flujo completo está cubierto por pruebas end-to-end.</p>
+  <p>Cómo funcionaba ANTES: el monolito tenía autenticación propietaria —contraseñas con MD5 y un token opaco guardado en la tabla session, que el frontend enviaba en un header en cada petición—. Ahora es un estándar: OAuth2 con contraseñas bcrypt, JWT firmados de corta vida más refresh token, y cualquier cliente nuevo se integra contra el estándar, no contra un formato inventado. El flujo completo está cubierto por pruebas end-to-end.</p>
   <a class="top" href="#top">↑ índice</a>
 </article>
 <article id="s24">
   <h2><span class="num">24</span> PAIMA: PortalAsig Intelligent MAPE-K</h2>
-  <p>PAIMA es el aporte central del trabajo: una aplicación práctica del ciclo MAPE-K con IA. No exige infraestructura nueva: consume lo que ya recolecta la observabilidad. La IA analiza y propone, pero hay dos salvaguardas: fallback determinista si el proveedor de IA no está disponible, y aprobación humana obligatoria.</p>
+  <p>PAIMA es el aporte central del trabajo: una aplicación práctica del ciclo MAPE-K con IA. No exige infraestructura nueva: consume lo que ya recolecta la observabilidad. La IA analiza y propone, pero hay dos salvaguardas: fallback determinista si el proveedor de IA no está disponible, y aprobación humana obligatoria. Y menciono el portalasig-cli: un script de operación que escribimos para interactuar con todos los servicios desde la terminal —levantar el stack, consultar salud, disparar el ciclo MAPE, sembrar datos— sin memorizar comandos de Docker ni endpoints.</p>
   <a class="top" href="#top">↑ índice</a>
 </article>
 <article id="s25">
@@ -204,7 +204,7 @@
 </article>
 <article id="s26">
   <h2><span class="num">26</span> Operación pensada para quien llega “en frío”</h2>
-  <p>El panel consolida lo esencial: qué servicios están sanos, qué incidentes hay abiertos y dónde mirar. Un estudiante que recibe el proyecto por primera vez puede orientarse sin una transferencia de conocimiento previa.</p>
+  <p>Aclaración importante: el panel de PAIMA cubre salud, incidentes y acciones —las métricas detalladas y los dashboards son de Grafana, que es su herramienta. El ecosistema documental para quien llega en frío tiene tres piezas: Swagger UI autogenerado desde el código de cada servicio —la documentación ya no se escribe aparte, nace de los propios endpoints—; el portalasig-cli para operar todo desde la terminal; y portalasig-pi, el repositorio de conocimiento del proyecto con guías por dominio que cualquier agente de IA puede cargar como contexto: con ese conocimiento, un agente ayuda de forma efectiva a un nuevo colaborador y reduce su curva de aprendizaje. Un estudiante que recibe el proyecto por primera vez puede orientarse sin una transferencia de conocimiento previa.</p>
   <a class="top" href="#top">↑ índice</a>
 </article>
 <article id="s27">
@@ -214,7 +214,7 @@
 </article>
 <article id="s28">
   <h2><span class="num">28</span> IA que propone, humano que decide</h2>
-  <p>El flujo de trabajo con la IA es conversacional: el operador pregunta, la IA explica el diagnóstico y propone —por ejemplo, reiniciar un servicio— pero la ejecución requiere el clic de aprobación. La autonomía tiene supervisión.</p>
+  <p>Precisión importante para no dar una impresión incorrecta: el chat es consultivo —sirve para que el operador entienda el diagnóstico— pero NO tiene implicación en el resultado final: no modifica el diagnóstico ni la acción que el ciclo MAPE ya produjo. La decisión se materializa únicamente con los botones de aprobar o rechazar, que quedan auditados con actor y comentario. Que la conversación alimente la planificación es una mejora natural que queda como trabajo futuro. La autonomía tiene supervisión.</p>
   <a class="top" href="#top">↑ índice</a>
 </article>
 <article id="s29">
@@ -224,7 +224,7 @@
 </article>
 <article id="s30">
   <h2><span class="num">30</span> Estrategia de pruebas en cuatro dimensiones</h2>
-  <p>La evaluación no fue una sola prueba: cuatro dimensiones con herramientas y criterios objetivos cada una. Las dos primeras miden calidad de código y de flujos; las dos últimas miden el comportamiento de la arquitectura bajo carga y bajo fallos.</p>
+  <p>La evaluación no fue una sola prueba: cuatro dimensiones con herramientas y criterios objetivos cada una. Dos aclaraciones por si preguntan la fila de rendimiento: p95 es el percentil noventa y cinco —el noventa y cinco por ciento de las peticiones respondió en menos de ese tiempo, mide la cola de latencia—; y throughput son las peticiones por segundo sostenidas. Y k6 con Prometheus no se consumen entre sí: k6 genera la carga y mide latencia y throughput desde el cliente; Prometheus observa CPU y memoria del lado del servidor —son dos puntos de vista complementarios del mismo experimento.</p>
   <a class="top" href="#top">↑ índice</a>
 </article>
 <article id="s31">
@@ -234,17 +234,17 @@
 </article>
 <article id="s32">
   <h2><span class="num">32</span> Flujos de usuario validados con Cypress</h2>
-  <p>Doce specs con cincuenta y dos casos simulan al usuario real contra el stack sembrado con datos anonimizados: autenticación OAuth, flujos de sitios, administración, PAIMA. Corren en 1 minuto 16 segundos y 18 de cada 20 corridas salen cien por ciento verdes —los dos fallos fueron del screenshot del navegador, no de aserciones. La suite incluso descubrió un bug real: evaluaciones sembradas con un tipo inexistente que devolvía 500.</p>
+  <p>Doce specs con cincuenta y dos casos simulan al usuario real contra el stack sembrado con datos anonimizados: autenticación OAuth, flujos de sitios, administración, PAIMA. Corren en 1 minuto 16 segundos y 18 de cada 20 corridas salen cien por ciento verdes —los dos fallos fueron del screenshot del navegador, no de aserciones. La suite incluso descubrió un bug real: evaluaciones sembradas con un tipo inexistente que devolvía 500. Por si preguntan cuáles son los doce specs: flujo OAuth2 y refresco de sesión; guards del router por rol; listado, contenido, evaluaciones y semestres de sitios; gestión de usuarios del admin; alertas de PAIMA; clientes Axios múltiples y depuración de red; módulos Vuex; y regresión visual.</p>
   <a class="top" href="#top">↑ índice</a>
 </article>
 <article id="s33">
   <h2><span class="num">33</span> Benchmarking con k6</h2>
-  <p>Resultado del benchmark: lectura 1,9 veces más rápida y casi el doble de throughput; escritura empatada pero con cero errores —el legacy devuelve 500 ante duplicados, el MS responde 200 idempotente—; y la autenticación es más lenta a propósito: bcrypt cuesta unas 5 veces más CPU que el MD5 del legacy, y ese costo queda aislado en UAA, que escala por sí solo. Cero fallas de plataforma en más de 390 mil peticiones. La limitación declarada: entorno controlado local, no producción.</p>
+  <p>Resultado del benchmark: lectura 1,9 veces más rápida y casi el doble de throughput; escritura empatada pero con cero errores —el legacy devuelve 500 ante duplicados, el MS responde 200 idempotente—; y la autenticación es más lenta a propósito: bcrypt cuesta unas 5 veces más CPU que el MD5 del legacy, y ese costo queda aislado en UAA, que escala por sí solo. Cero fallas de plataforma en más de 390 mil peticiones. Si preguntan qué significa que el costo de bcrypt queda aislado: el sobreprecio de la verificación segura solo se paga dentro de UAA en el login —no contamina la latencia de los demás endpoints— y si el login necesita más capacidad, escalo únicamente el servicio UAA sin tocar el resto; en el monolito no hay esa opción. La limitación declarada: entorno controlado local, no producción.</p>
   <a class="top" href="#top">↑ índice</a>
 </article>
 <article id="s34">
   <h2><span class="num">34</span> Simulación de caos: caída de un servicio</h2>
-  <p>El experimento clave: matamos ms-site a propósito, tres iteraciones. Dos cosas se demuestran a la vez: el aislamiento de fallos —el resto del ecosistema siguió vivo— y el ciclo completo de PAIMA con tiempos medidos: detección en un solo ciclo MAPE de unos dos minutos —peor caso cuatro minutos cincuenta y nueve segundos por la ventana del scheduler de cinco minutos—, correo P1 con diagnóstico de la IA, y recuperación en unos veinte segundos tras la aprobación humana.</p>
+  <p>El experimento clave: matamos ms-site a propósito, tres iteraciones. Dos cosas se demuestran a la vez: el aislamiento de fallos —el resto del ecosistema siguió vivo— y el ciclo completo de PAIMA con tiempos medidos: detección en un solo ciclo MAPE de unos dos minutos —peor caso cuatro minutos cincuenta y nueve segundos por la ventana del scheduler de cinco minutos—, correo P1 con diagnóstico de la IA, y recuperación en unos veinte segundos tras la aprobación humana. Si preguntan si el caos está automatizado: el procedimiento es reproducible pero manual —detenemos el contenedor con docker stop y validamos el ciclo completo con evidencias (alertas, correo, panel)—; automatizar el game-day como prueba continua de chaos engineering queda como línea de evolución.</p>
   <a class="top" href="#top">↑ índice</a>
 </article>
 <article id="s35">
@@ -279,7 +279,7 @@
 </article>
 <article id="s41">
   <h2><span class="num">41</span> Líneas de evolución identificadas</h2>
-  <p>Las líneas de evolución nacen de las propias limitaciones: gateway centralizado, IA local especializada para no depender de proveedores externos, PAIMA más integrado al ciclo de desarrollo, Vue 3, y la migración de los datos históricos que quedó fuera de alcance.</p>
+  <p>Las líneas de evolución nacen de las propias limitaciones: gateway centralizado, IA local especializada para no depender de proveedores externos, PAIMA más integrado al ciclo de desarrollo, Vue 3, y la migración de los datos históricos que quedó fuera de alcance. Aclaración sobre trazabilidad distribuida: hoy SÍ hay métricas y logs centralizados por servicio —lo que no existe son trazas que sigan una petición individual a través de varios servicios con un identificador de correlación; eso es lo que aportaría OpenTelemetry y por eso figura como línea de evolución, no como algo ya resuelto.</p>
   <a class="top" href="#top">↑ índice</a>
 </article>
 <article id="s42">
