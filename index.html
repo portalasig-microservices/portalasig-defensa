@@ -1194,21 +1194,110 @@ body.anno-review-open .anno-review-close{ display: block; }
       <h2>PAIMA: PortalAsig Intelligent MAPE-K</h2>
     </div>
     <div class="slide__body">
-      <div class="media">
-        <div class="txt">
-          <ul class="bullets" style="font-size:21px">
-            <li>Se construye <b>sobre la observabilidad ya instalada</b>: Prometheus, Loki, Grafana</li>
-            <li>Las fases <b>Analyze y Plan se delegan a un LLM</b> — proveedor configurable con <b>fallback determinista</b></li>
-            <li><b class="accent">Human-in-the-loop</b>: el operador evalúa y aprueba cada acción antes de ejecutarse</li>
-          </ul>
-        </div>
-        <figure>
-          <div class="figure" style="min-height:340px"><img src="img/paima-clases.png" alt="Arquitectura interna PAIMA"></div>
-          <figcaption>Fig. 6 · Arquitectura interna de PAIMA.</figcaption>
-        </figure>
+      <div class="txt">
+        <ul class="bullets" style="font-size:24px; max-width:940px">
+          <li>Se construye <b>sobre la observabilidad ya instalada</b>: Prometheus, Loki, Grafana</li>
+          <li>Las fases <b>Analyze y Plan se delegan a un LLM</b> — proveedor configurable con <b>fallback determinista</b></li>
+          <li><b class="accent">Human-in-the-loop</b>: el operador evalúa y aprueba cada acción antes de ejecutarse</li>
+          <li>Su interior es <b>el ciclo MAPE-K implementado en clases</b> — siguiente lámina</li>
+        </ul>
       </div>
     </div>
     <aside class="notes">PAIMA es la contribución original del trabajo. No exige infraestructura nueva: consume lo que ya recolecta la observabilidad. La IA analiza y propone, pero hay dos salvaguardas: fallback determinista si el proveedor de IA no está disponible, y aprobación humana obligatoria.</aside>
+  </section>
+
+
+  <!-- 24B · PAIMA POR DENTRO (lámina completa) -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Solución · Autogestión</p>
+      <h2>PAIMA por dentro: el ciclo MAPE-K en clases</h2>
+    </div>
+    <div class="slide__body" style="justify-content:center">
+      <svg viewBox="0 0 1240 560" style="width:100%; height:auto; max-height:540px" role="img" aria-label="Arquitectura interna de PAIMA: ciclo MAPE-K">
+    <defs>
+      <marker id="pD" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L12,6 L0,12 z" fill="#b96f00"/></marker>
+      <marker id="pM" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#6f7b84"/></marker>
+    </defs>
+
+    <!-- flujo MAPE-K (detrás) -->
+    <g fill="none">
+      <path d="M468,196 L502,196" stroke="#b96f00" stroke-width="5" opacity="0.45" marker-end="url(#pD)"/>
+      <path d="M768,196 L802,196" stroke="#b96f00" stroke-width="5" opacity="0.45" marker-end="url(#pD)"/>
+      <path d="M905,340 C905,470 620,500 360,470 L360,352" stroke="#b96f00" stroke-width="2.5" stroke-dasharray="6 4" opacity="0.65" marker-end="url(#pD)"/>
+      <text x="620" y="492" text-anchor="middle" font-size="10.5" font-weight="700" fill="#b96f00">Knowledge retroalimenta el ciclo (alertas persistidas + feedback del operador)</text>
+      <!-- scheduler -> loop -->
+      <path d="M620,106 L620,138" stroke="#6f7b84" stroke-dasharray="4 3" marker-end="url(#pM)"/>
+      <!-- loop coordina fases -->
+      <g stroke="#6f7b84" stroke-dasharray="4 3" opacity="0.7">
+        <path d="M560,172 L380,172 L380,196" marker-end="url(#pM)"/>
+        <path d="M640,172 L640,172" />
+        <path d="M700,172 L900,172 L900,196" marker-end="url(#pM)"/>
+      </g>
+      <!-- notify -> correo -->
+      <path d="M1020,268 L1020,308 L560,308 L560,348" stroke="#6f7b84" stroke-dasharray="4 3" opacity="0" />
+    </g>
+
+    <!-- API REST -->
+    <text x="30" y="60" font-size="10.5" font-weight="700" fill="#008cba">API REST</text>
+    <rect x="30" y="70" width="190" height="58" rx="8" fill="#ecf5f9" stroke="#008cba" stroke-width="1.6"/><text x="125.0" y="94" text-anchor="middle" font-size="10.5" font-weight="700" fill="#222">PaimaMapeController</text><text x="125.0" y="111" text-anchor="middle" font-size="9" fill="#555">/paima/mape/*</text>
+    <rect x="30" y="138" width="190" height="58" rx="8" fill="#ecf5f9" stroke="#008cba" stroke-width="1.6"/><text x="125.0" y="162" text-anchor="middle" font-size="10.5" font-weight="700" fill="#222">PaimaAlertController</text><text x="125.0" y="179" text-anchor="middle" font-size="9" fill="#555">/paima/alerts/*</text>
+    <rect x="30" y="206" width="190" height="58" rx="8" fill="#ecf5f9" stroke="#008cba" stroke-width="1.6"/><text x="125.0" y="230" text-anchor="middle" font-size="10.5" font-weight="700" fill="#222">PaimaLlmController</text><text x="125.0" y="247" text-anchor="middle" font-size="9" fill="#555">/paima/llm/chat</text>
+
+    <!-- Orquestador -->
+    <rect x="460" y="40" width="320" height="66" rx="8" fill="#fdf3e3" stroke="#e99002" stroke-width="1.6"/><text x="620.0" y="64" text-anchor="middle" font-size="14" font-weight="700" fill="#222">PaimaMapeLoopService</text><text x="620.0" y="81" text-anchor="middle" font-size="9" fill="#555">runCycle() · getStatus()</text>
+    <rect x="830" y="40" width="280" height="66" rx="8" fill="#fff" stroke="#6f7b84" stroke-width="1.6" stroke-dasharray="5 3"/><text x="970.0" y="64" text-anchor="middle" font-size="12" font-weight="700" fill="#222">PaimaMapeScheduler</text><text x="970.0" y="81" text-anchor="middle" font-size="9" fill="#555">@Scheduled · cron 5 min</text>
+
+    <!-- FASE 1 · MONITOR -->
+    <text x="250" y="152" font-size="11" font-weight="800" fill="#b96f00">1 · MONITOR</text>
+    <rect x="240" y="160" width="228" height="192" rx="10" fill="#e99002" opacity="0.06" stroke="#e99002" stroke-width="1.2" stroke-dasharray="5 3"/>
+    <rect x="252" y="172" width="204" height="56" rx="8" fill="#fdf3e3" stroke="#e99002" stroke-width="1.6"/><text x="354.0" y="196" text-anchor="middle" font-size="10.5" font-weight="700" fill="#222">ObservabilityCollectorService</text><text x="354.0" y="213" text-anchor="middle" font-size="9" fill="#555">collect() · Prometheus + Loki</text>
+    <rect x="252" y="240" width="204" height="20" rx="4" fill="#fff" stroke="#cfd8dc" stroke-width="0.9"/><text x="354.0" y="254" text-anchor="middle" font-family="monospace" font-size="9" fill="#333">MonitoringSnapshot (dto)</text>
+    <rect x="252" y="264" width="204" height="20" rx="4" fill="#fff" stroke="#cfd8dc" stroke-width="0.9"/><text x="354.0" y="278" text-anchor="middle" font-family="monospace" font-size="9" fill="#333">ServiceHealthSnapshot (dto)</text>
+    <rect x="252" y="288" width="204" height="20" rx="4" fill="#fff" stroke="#cfd8dc" stroke-width="0.9"/><text x="354.0" y="302" text-anchor="middle" font-family="monospace" font-size="9" fill="#333">PrometheusReadResult (dto)</text>
+    <rect x="252" y="312" width="204" height="20" rx="4" fill="#fff" stroke="#cfd8dc" stroke-width="0.9"/><text x="354.0" y="326" text-anchor="middle" font-family="monospace" font-size="9" fill="#333">LokiReadResult (dto)</text>
+
+    <!-- FASE 2 · ANALYZE + PLAN -->
+    <text x="510" y="152" font-size="11" font-weight="800" fill="#b96f00">2 · ANALYZE + PLAN</text>
+    <rect x="500" y="160" width="268" height="192" rx="10" fill="#e99002" opacity="0.06" stroke="#e99002" stroke-width="1.2" stroke-dasharray="5 3"/>
+    <rect x="512" y="172" width="244" height="50" rx="8" fill="#fdf3e3" stroke="#e99002" stroke-width="1.6"/><text x="634.0" y="196" text-anchor="middle" font-size="11" font-weight="700" fill="#222">PaimaAiPlanner</text><text x="634.0" y="213" text-anchor="middle" font-size="9" fill="#555">analyzeAndPlan()</text>
+    <rect x="512" y="232" width="244" height="44" rx="8" fill="#fff" stroke="#008cba" stroke-width="1.6" stroke-dasharray="5 3"/><text x="634.0" y="256" text-anchor="middle" font-size="10.5" font-weight="700" fill="#222">«interface» PaimaAiProvider</text><text x="634.0" y="273" text-anchor="middle" font-size="9" fill="#555">analyze() · strategy</text>
+    <rect x="512" y="286" width="118" height="20" rx="4" fill="#eef7ee" stroke="#43ac6a" stroke-width="0.9"/><text x="571.0" y="300" text-anchor="middle" font-family="monospace" font-size="9" fill="#333">RuleBased</text>
+    <rect x="638" y="286" width="118" height="20" rx="4" fill="#eef7ee" stroke="#43ac6a" stroke-width="0.9"/><text x="697.0" y="300" text-anchor="middle" font-family="monospace" font-size="9" fill="#333">OpenAI-compat.</text>
+    <rect x="512" y="310" width="118" height="20" rx="4" fill="#eef7ee" stroke="#43ac6a" stroke-width="0.9"/><text x="571.0" y="324" text-anchor="middle" font-family="monospace" font-size="9" fill="#333">Ollama</text>
+    <rect x="638" y="310" width="118" height="20" rx="4" fill="#eef7ee" stroke="#43ac6a" stroke-width="0.9"/><text x="697.0" y="324" text-anchor="middle" font-family="monospace" font-size="9" fill="#333">fallback determ.</text>
+    <rect x="512" y="334" width="244" height="20" rx="4" fill="#fff" stroke="#cfd8dc" stroke-width="0.9"/><text x="634.0" y="348" text-anchor="middle" font-family="monospace" font-size="9" fill="#333">AiPlanResult · AlertRecommendation (dto)</text>
+
+    <!-- FASE 3 · EXECUTE -->
+    <text x="810" y="152" font-size="11" font-weight="800" fill="#b96f00">3 · EXECUTE</text>
+    <rect x="800" y="160" width="210" height="192" rx="10" fill="#e99002" opacity="0.06" stroke="#e99002" stroke-width="1.2" stroke-dasharray="5 3"/>
+    <rect x="812" y="172" width="186" height="56" rx="8" fill="#fdf3e3" stroke="#e99002" stroke-width="1.6"/><text x="905.0" y="196" text-anchor="middle" font-size="10" font-weight="700" fill="#222">AutonomicActionExecutor</text><text x="905.0" y="213" text-anchor="middle" font-size="9" fill="#555">execute() · whitelist + aprobación</text>
+    <rect x="812" y="240" width="186" height="56" rx="8" fill="#fdf3e3" stroke="#e99002" stroke-width="1.6"/><text x="905.0" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#222">PaimaNotificationService</text><text x="905.0" y="281" text-anchor="middle" font-size="9" fill="#555">notifyIfNeeded() · vía ms-notify</text>
+
+    <!-- FASE 4 · KNOWLEDGE -->
+    <text x="1030" y="152" font-size="11" font-weight="800" fill="#b96f00">4 · KNOWLEDGE</text>
+    <rect x="1020" y="160" width="200" height="192" rx="10" fill="#e99002" opacity="0.06" stroke="#e99002" stroke-width="1.2" stroke-dasharray="5 3"/>
+    <rect x="1032" y="172" width="176" height="20" rx="4" fill="#f5f5f5" stroke="#6f7b84" stroke-width="0.9"/><text x="1120.0" y="186" text-anchor="middle" font-family="monospace" font-size="9" fill="#333">PaimaAlert (entity)</text>
+    <rect x="1032" y="196" width="176" height="20" rx="4" fill="#f5f5f5" stroke="#6f7b84" stroke-width="0.9"/><text x="1120.0" y="210" text-anchor="middle" font-family="monospace" font-size="9" fill="#333">PaimaAlertFeedback</text>
+    <rect x="1032" y="240" width="176" height="20" rx="4" fill="#f5f5f5" stroke="#6f7b84" stroke-width="0.9"/><text x="1120.0" y="254" text-anchor="middle" font-family="monospace" font-size="9" fill="#333">PaimaAlertRepository</text>
+    <rect x="1032" y="264" width="176" height="20" rx="4" fill="#f5f5f5" stroke="#6f7b84" stroke-width="0.9"/><text x="1120.0" y="278" text-anchor="middle" font-family="monospace" font-size="9" fill="#333">AlertFeedbackRepo (JPA)</text>
+    <rect x="1032" y="308" width="176" height="20" rx="4" fill="#f5f5f5" stroke="#6f7b84" stroke-width="0.9"/><text x="1120.0" y="322" text-anchor="middle" font-family="monospace" font-size="9" fill="#333">mysql-paima</text>
+
+    <!-- leyenda -->
+    <g font-size="10.5" fill="#222">
+      <rect x="30" y="528" width="12" height="12" fill="#fdf3e3" stroke="#e99002"/><text x="48" y="538">Servicio MAPE-K</text>
+      <rect x="170" y="528" width="12" height="12" fill="#ecf5f9" stroke="#008cba"/><text x="188" y="538">API REST</text>
+      <rect x="270" y="528" width="12" height="12" fill="#fff" stroke="#008cba" stroke-dasharray="3 2"/><text x="288" y="538">Interfaz (strategy)</text>
+      <rect x="420" y="528" width="12" height="12" fill="#eef7ee" stroke="#43ac6a"/><text x="438" y="538">Proveedores IA</text>
+      <rect x="556" y="528" width="12" height="12" fill="#fff" stroke="#cfd8dc"/><text x="574" y="538">DTO</text>
+      <rect x="630" y="528" width="12" height="12" fill="#f5f5f5" stroke="#6f7b84"/><text x="648" y="538">Persistencia</text>
+      <line x1="790" y1="534" x2="822" y2="534" stroke="#b96f00" stroke-width="4" opacity="0.5"/><text x="828" y="538">Flujo MAPE-K</text>
+      <line x1="950" y1="534" x2="982" y2="534" stroke="#6f7b84" stroke-dasharray="4 3"/><text x="988" y="538">Coordinación</text>
+      <text x="1210" y="26" text-anchor="end" font-size="12.5" font-weight="800" fill="#b96f00">M → A → P → E sobre Knowledge</text>
+    </g>
+  </svg>
+    </div>
+    <aside class="notes">La arquitectura interna sigue literalmente el ciclo: el Scheduler dispara cada cinco minutos al MapeLoopService, que coordina las cuatro fases. Monitor recolecta de Prometheus y Loki y arma snapshots; Analyze y Plan pasan por un planner que delega en una interfaz de proveedor con tres estrategias —Kimi/OpenAI-compatible, Ollama local y un fallback determinista basado en reglas—; Execute corre las acciones aprobadas con whitelist y notifica por correo vía ms-notify; y Knowledge persiste alertas y feedback en su propia base, que retroalimenta el ciclo. Arriba a la izquierda, los tres controladores REST que expone al frontend.</aside>
   </section>
 
   <!-- 23 · PAIMA DASHBOARD -->
@@ -1218,24 +1307,35 @@ body.anno-review-open .anno-review-close{ display: block; }
       <h2>Operación pensada para quien llega “en frío”</h2>
     </div>
     <div class="slide__body">
-      <div class="media media-left">
-        <div class="txt">
-          <ul class="bullets" style="font-size:21px">
-            <li>Salud del ecosistema <b>en un vistazo</b>: servicios, incidentes activos, métricas</li>
-            <li>Logs y métricas <b>consolidados por servicio</b> en un solo panel</li>
-            <li>Reduce la curva de entrada de un <b>nuevo mantenedor</b></li>
-          </ul>
-        </div>
-        <figure>
-          <div class="figure" style="min-height:340px"><img src="img/paima-dashboard.png" alt="Dashboard PAIMA"></div>
-          <figcaption>Fig. 7 · Panel de gestión de PAIMA.</figcaption>
-        </figure>
+      <div class="txt">
+        <ul class="bullets" style="font-size:24px; max-width:940px">
+          <li>Salud del ecosistema <b>en un vistazo</b>: servicios, incidentes activos, métricas</li>
+          <li>Logs y métricas <b>consolidados por servicio</b> en un solo panel</li>
+          <li>Reduce la curva de entrada de un <b>nuevo mantenedor</b></li>
+          <li>El panel real, capturado durante la simulación de caos — siguiente lámina</li>
+        </ul>
       </div>
     </div>
     <aside class="notes">El panel consolida lo esencial: qué servicios están sanos, qué incidentes hay abiertos y dónde mirar. Un estudiante que recibe el proyecto por primera vez puede orientarse sin una transferencia de conocimiento previa.</aside>
   </section>
 
   <!-- 24 · PAIMA IA + APROBACIÓN -->
+  
+  <!-- 26B · DASHBOARD PAIMA (lámina completa) -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Solución · Autogestión</p>
+      <h2>El panel de PAIMA en operación real</h2>
+    </div>
+    <div class="slide__body">
+      <figure style="flex:1; justify-content:center">
+        <div class="figure" style="min-height:0; height:460px; padding:10px"><img src="img/paima-dashboard.png" alt="Dashboard PAIMA" style="max-height:440px; width:auto; max-width:100%"></div>
+        <figcaption>Fig. 7 · Panel de gestión de PAIMA durante la simulación de caos: salud de servicios, incidentes P1 y la recomendación de la IA.</figcaption>
+      </figure>
+    </div>
+    <aside class="notes">El panel real, sin maquetas: a la izquierda la salud de cada servicio, el semáforo de la última corrida del ciclo y las acciones pendientes; a la derecha el detalle del incidente P1 con la recomendación textual de la IA. Dato curioso para la defensa: la recomendación que se ve aquí —permitir acceso anónimo al actuator de salud— es literalmente el fix que aplicamos después al alinear la configuración de seguridad de ms-site con la de UAA y Notify.</aside>
+  </section>
+
   <section class="slide">
     <div class="slide__head">
       <p class="kicker">Solución · Autogestión</p>
