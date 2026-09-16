@@ -105,6 +105,7 @@ ul.arrow li::before{ content: "→"; position: absolute; left: 0; color: var(--a
   background: var(--bg); border: 1px solid var(--line);
   border-radius: var(--radius); padding: 22px 24px;
 }
+.cards{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
 .card h3{ margin: 0 0 10px; font-size: 22px; color: var(--accent); }
 .card p{ margin: 0; font-size: 18px; line-height: 1.45; color: var(--muted); }
 .card--soft{ background: var(--soft); border-color: transparent; }
@@ -769,7 +770,7 @@ body.anno-review-open .anno-review-close{ display: block; }
     <p class="kicker">Sección</p>
     <div class="num">02</div>
     <h2>Marco conceptual</h2>
-    <p>Tres ideas que sustentan el trabajo: microservicios, computación autonómica y el ciclo MAPE-K.</p>
+    <p>Tres ideas que sustentan el trabajo: microservicios, ingeniería de mantenimiento de software y computación autonómica (ciclo MAPE-K).</p>
   </section>
 
   <!-- 11 · MONOLITO VS MICROSERVICIOS -->
@@ -803,6 +804,26 @@ body.anno-review-open .anno-review-close{ display: block; }
       <p class="muted small">A cambio, introduce complejidad operativa: más procesos, más bases de datos, monitoreo distribuido. Esa complejidad es la que aborda PAIMA.</p>
     </div>
     <aside class="notes">La comparación clásica, pero enfatizo el costo: los microservicios no son gratis —multiplican procesos, bases de datos y puntos que vigilar—. Ese costo operativo es precisamente lo que motiva la segunda mitad del trabajo: la autogestión.</aside>
+  </section>
+
+
+  <!-- 13 · INGENIERÍA DE MANTENIMIENTO -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Marco conceptual</p>
+      <h2>Ingeniería de mantenimiento de software</h2>
+    </div>
+    <div class="slide__body">
+      <p class="lead" style="font-size:20px">El estándar <b>ISO/IEC/IEEE 14764</b> clasifica el mantenimiento en cuatro tipos —y las técnicas modernas lo convierten en un proceso <b>sistemático, medible y reproducible</b>:</p>
+      <div class="cards">
+        <div class="card"><h3>Correctivo</h3><p>Reparar defectos detectados en producción (el 500 que devolvía una evaluación mal sembrada).</p></div>
+        <div class="card"><h3>Adaptativo</h3><p>Ajustar el sistema a entornos nuevos (Node 12 fuera de soporte, navegadores actuales).</p></div>
+        <div class="card"><h3>Perfectivo</h3><p>Mejorar atributos sin cambiar funcionalidad (rendimiento, legibilidad, deuda técnica).</p></div>
+        <div class="card"><h3>Preventivo</h3><p>Evitar fallos futuros: pruebas automatizadas, cobertura exigida, esquema versionado, observabilidad.</p></div>
+      </div>
+      <p class="muted small">Gran parte de este trabajo es mantenimiento preventivo sistematizado: la validación deja de depender del conocimiento tácito y la exige el pipeline en cada cambio.</p>
+    </div>
+    <aside class="notes">El mantenimiento no es solo arreglar bugs: la norma ISO 14764 lo clasifica en correctivo, adaptativo, perfectivo y preventivo. El monolito solo recibía —a duras penas— los dos primeros; mi trabajo lo dota de mantenimiento preventivo sistemático: integración continua que valida cada cambio, cobertura con umbral que bloquea la fusión, esquema versionado con Flyway y observabilidad. Es la respuesta directa al problema humano: el sistema se vuelve mantenible por gente que llega en frío, porque la calidad la impone el proceso y no la memoria de nadie.</aside>
   </section>
 
   <!-- 12 · MAPE-K -->
