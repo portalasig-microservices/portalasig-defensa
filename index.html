@@ -1393,13 +1393,43 @@ body.anno-review-open .anno-review-close{ display: block; }
       <h2>Cobertura medida y exigida automáticamente</h2>
     </div>
     <div class="slide__body">
-      <div class="kpis">
-        <div class="kpi"><b>80,5–91,8%</b><span>líneas por microservicio</span></div>
-        <div class="kpi"><b>70 / 60</b><span>piso mínimo del proyecto: % líneas / % ramas, exigido en cada PR</span></div>
-        <div class="kpi"><b>0%</b><span>cobertura del monolito legacy</span></div>
-        <div class="kpi"><b>4</b><span>pipelines con merge bloqueado</span></div>
+      <div class="media">
+        <div class="txt">
+          <h3 style="margin:0 0 12px; font-size:20px; color:var(--accent)">Cómo se mide y se exige</h3>
+          <ul class="bullets" style="font-size:19px">
+            <li><b>JaCoCo</b> mide líneas y ramas en cada build del pipeline</li>
+            <li>Pruebas de integración con <b>Testcontainers + MySQL 8 real</b> — no H2 ni mocks</li>
+            <li><b>Piso 70/60</b>: si el total del servicio baja del umbral, el build falla y GitHub <b>bloquea el merge</b></li>
+            <li>Checkstyle + <b>branch protection</b> con check requerido en los 4 repos</li>
+            <li>Escribir la suite destapó <b class="accent">11 bugs reales</b> antes de producción</li>
+          </ul>
+        </div>
+        <div class="txt">
+          <h3 style="margin:0 0 12px; font-size:20px; color:var(--accent)">Cobertura por servicio (líneas / ramas)</h3>
+          <div style="margin-bottom:14px">
+          <div style="display:flex; justify-content:space-between; font-size:15px; font-weight:700; margin-bottom:4px"><span style="font-family:monospace">ms-uaa</span><span>84,6% / 64,4%</span></div>
+          <div style="background:#e5f2f7; border-radius:4px; height:14px; margin-bottom:3px"><div style="background:#008cba; height:14px; border-radius:4px; width:84.6%"></div></div>
+          <div style="background:#fdeeda; border-radius:4px; height:10px"><div style="background:#e99002; height:10px; border-radius:4px; width:64.4%"></div></div>
+        </div>
+          <div style="margin-bottom:14px">
+          <div style="display:flex; justify-content:space-between; font-size:15px; font-weight:700; margin-bottom:4px"><span style="font-family:monospace">ms-site</span><span>80,5% / 61,3%</span></div>
+          <div style="background:#e5f2f7; border-radius:4px; height:14px; margin-bottom:3px"><div style="background:#008cba; height:14px; border-radius:4px; width:80.5%"></div></div>
+          <div style="background:#fdeeda; border-radius:4px; height:10px"><div style="background:#e99002; height:10px; border-radius:4px; width:61.3%"></div></div>
+        </div>
+          <div style="margin-bottom:14px">
+          <div style="display:flex; justify-content:space-between; font-size:15px; font-weight:700; margin-bottom:4px"><span style="font-family:monospace">ms-notify</span><span>91,8% / 71,4%</span></div>
+          <div style="background:#e5f2f7; border-radius:4px; height:14px; margin-bottom:3px"><div style="background:#008cba; height:14px; border-radius:4px; width:91.8%"></div></div>
+          <div style="background:#fdeeda; border-radius:4px; height:10px"><div style="background:#e99002; height:10px; border-radius:4px; width:71.4%"></div></div>
+        </div>
+          <div style="margin-bottom:14px">
+          <div style="display:flex; justify-content:space-between; font-size:15px; font-weight:700; margin-bottom:4px"><span style="font-family:monospace">paima</span><span>85,5% / 78,6%</span></div>
+          <div style="background:#e5f2f7; border-radius:4px; height:14px; margin-bottom:3px"><div style="background:#008cba; height:14px; border-radius:4px; width:85.5%"></div></div>
+          <div style="background:#fdeeda; border-radius:4px; height:10px"><div style="background:#e99002; height:10px; border-radius:4px; width:78.6%"></div></div>
+        </div>
+          <p class="muted small" style="margin-top:6px"><span style="color:#008cba">■</span> líneas &nbsp;<span style="color:#e99002">■</span> ramas &nbsp;·&nbsp; piso exigido: 70 / 60</p>
+        </div>
       </div>
-      <p class="lead fragment" style="font-size:21px">De <b>cero</b> a cobertura <b>medida y exigida</b> en cada cambio: la calidad se volvió sistemática.</p>
+      <p class="lead fragment" style="font-size:21px">De <b>cero</b> (el monolito no tenía ni una prueba) a cobertura <b>medida y exigida</b> en cada cambio.</p>
     </div>
     <aside class="notes">El contraste es cualitativo: el monolito no tenía ni una prueba; hoy cada servicio mide entre 80,5 y 91,8 por ciento de líneas —UAA 84,6, Site 80,5, Notify 91,8, PAIMA 85,5— y si un PR baja del umbral, la fusión se bloquea sola. Aclaración por si preguntan el 70/60: no es el porcentaje del código añadido en el PR, es el piso mínimo de cobertura TOTAL del servicio —setenta por ciento de líneas y sesenta por ciento de ramas, medido en cada PR—; las ramas son más exigentes porque un if probado solo por el camino verdadero suma líneas pero no ramas, por eso su umbral es menor. Los tests son de integración contra MySQL real con Testcontainers, no H2; escribirlos destapó 11 bugs reales antes de producción.</aside>
   </section>
