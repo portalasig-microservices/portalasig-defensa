@@ -1310,8 +1310,8 @@ body.anno-hidden .anno-fab{ display: none !important; }
     <div class="slide__body">
       <div class="txt">
         <ul class="bullets" style="font-size:24px; max-width:940px">
-          <li>Salud del ecosistema <b>en un vistazo</b>: servicios e incidentes activos</li>
-          <li>El panel cubre <b>salud e incidentes</b>; las métricas y dashboards detallados viven en <b>Grafana</b></li>
+          <li>Incidentes autonómicos <b>en un vistazo</b>: prioridad, servicio afectado y estado</li>
+          <li>La <b>salud en vivo</b> y las métricas detalladas se consultan en <b>Grafana</b> (Prometheus/Loki)</li>
           <li>Reduce la curva de entrada de un <b>nuevo mantenedor</b></li>
           <li>Documentación API <b>autogenerada</b> (Swagger/OpenAPI desde el propio código)</li>
           <li><b>portalasig-pi</b>: repositorio de conocimiento del proyecto que cualquier agente de IA usa para hacer onboarding y asistir con eficacia a un nuevo colaborador</li>
@@ -1319,7 +1319,7 @@ body.anno-hidden .anno-fab{ display: none !important; }
         </ul>
       </div>
     </div>
-    <aside class="notes">Aclaración importante: el panel de PAIMA cubre salud, incidentes y acciones —las métricas detalladas y los dashboards son de Grafana, que es su herramienta. El ecosistema documental para quien llega en frío tiene tres piezas: Swagger UI autogenerado desde el código de cada servicio —la documentación ya no se escribe aparte, nace de los propios endpoints—; el portalasig-cli para operar todo desde la terminal; y portalasig-pi, el repositorio de conocimiento del proyecto con guías por dominio que cualquier agente de IA puede cargar como contexto: con ese conocimiento, un agente ayuda de forma efectiva a un nuevo colaborador y reduce su curva de aprendizaje. Un estudiante que recibe el proyecto por primera vez puede orientarse sin una transferencia de conocimiento previa.</aside>
+    <aside class="notes">Aclaración importante: el panel de PAIMA cubre incidentes —alertas priorizadas con su diagnóstico y acciones pendientes—; la salud en vivo de los servicios y las métricas detalladas se consultan en Grafana, que es la herramienta para eso. El ecosistema documental para quien llega en frío tiene tres piezas: Swagger UI autogenerado desde el código de cada servicio —la documentación ya no se escribe aparte, nace de los propios endpoints—; el portalasig-cli para operar todo desde la terminal; y portalasig-pi, el repositorio de conocimiento del proyecto con guías por dominio que cualquier agente de IA puede cargar como contexto: con ese conocimiento, un agente ayuda de forma efectiva a un nuevo colaborador y reduce su curva de aprendizaje. Un estudiante que recibe el proyecto por primera vez puede orientarse sin una transferencia de conocimiento previa.</aside>
   </section>
 
   <!-- 24 · PAIMA IA + APROBACIÓN -->
@@ -1333,10 +1333,10 @@ body.anno-hidden .anno-fab{ display: none !important; }
     <div class="slide__body">
       <figure style="flex:1; justify-content:center">
         <div class="figure" style="min-height:0; height:460px; padding:10px"><img src="img/paima-dashboard.png" alt="Dashboard PAIMA" style="max-height:440px; width:auto; max-width:100%"></div>
-        <figcaption>Fig. 7 · Panel de gestión de PAIMA durante la simulación de caos: salud de servicios, incidentes P1 y la recomendación de la IA.</figcaption>
+        <figcaption>Fig. 7 · Panel de gestión de PAIMA durante la simulación de caos: lista de alertas pendientes, detalle del incidente P1 y la recomendación de la IA.</figcaption>
       </figure>
     </div>
-    <aside class="notes">El panel real, sin maquetas: a la izquierda la salud de cada servicio, el semáforo de la última corrida del ciclo y las acciones pendientes; a la derecha el detalle del incidente P1 con la recomendación textual de la IA. Dato curioso para la defensa: la recomendación que se ve aquí —permitir acceso anónimo al actuator de salud— es literalmente el fix que aplicamos después al alinear la configuración de seguridad de ms-site con la de UAA y Notify.</aside>
+    <aside class="notes">El panel real, sin maquetas: a la izquierda la lista de alertas pendientes con su prioridad y servicio afectado; a la derecha el detalle del incidente P1 con la recomendación textual de la IA y los botones de aprobar o rechazar. Dato curioso para la defensa: la recomendación que se ve aquí —permitir acceso anónimo al actuator de salud— es literalmente el fix que aplicamos después al alinear la configuración de seguridad de ms-site con la de UAA y Notify.</aside>
   </section>
 
   <section class="slide">
