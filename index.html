@@ -1395,13 +1395,13 @@ body.anno-review-open .anno-review-close{ display: block; }
     <div class="slide__body">
       <div class="kpis">
         <div class="kpi"><b>80,5–91,8%</b><span>líneas por microservicio</span></div>
-        <div class="kpi"><b>70 / 60</b><span>umbral líneas / ramas en cada PR</span></div>
+        <div class="kpi"><b>70 / 60</b><span>piso mínimo del proyecto: % líneas / % ramas, exigido en cada PR</span></div>
         <div class="kpi"><b>0%</b><span>cobertura del monolito legacy</span></div>
         <div class="kpi"><b>4</b><span>pipelines con merge bloqueado</span></div>
       </div>
       <p class="lead fragment" style="font-size:21px">De <b>cero</b> a cobertura <b>medida y exigida</b> en cada cambio: la calidad se volvió sistemática.</p>
     </div>
-    <aside class="notes">El contraste es cualitativo: el monolito no tenía ni una prueba; hoy cada servicio mide entre 80,5 y 91,8 por ciento de líneas —UAA 84,6, Site 80,5, Notify 91,8, PAIMA 85,5— y si un PR baja del umbral 70/60, la fusión se bloquea sola. Los tests son de integración contra MySQL real con Testcontainers, no H2; escribirlos destapó 11 bugs reales antes de producción.</aside>
+    <aside class="notes">El contraste es cualitativo: el monolito no tenía ni una prueba; hoy cada servicio mide entre 80,5 y 91,8 por ciento de líneas —UAA 84,6, Site 80,5, Notify 91,8, PAIMA 85,5— y si un PR baja del umbral, la fusión se bloquea sola. Aclaración por si preguntan el 70/60: no es el porcentaje del código añadido en el PR, es el piso mínimo de cobertura TOTAL del servicio —setenta por ciento de líneas y sesenta por ciento de ramas, medido en cada PR—; las ramas son más exigentes porque un if probado solo por el camino verdadero suma líneas pero no ramas, por eso su umbral es menor. Los tests son de integración contra MySQL real con Testcontainers, no H2; escribirlos destapó 11 bugs reales antes de producción.</aside>
   </section>
 
   <!-- 28 · E2E -->
