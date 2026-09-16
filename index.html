@@ -1399,9 +1399,8 @@ body.anno-review-open .anno-review-close{ display: block; }
           <ul class="bullets" style="font-size:19px">
             <li><b>JaCoCo</b> mide líneas y ramas en cada build del pipeline</li>
             <li>Pruebas de integración con <b>Testcontainers + MySQL 8 real</b> — no H2 ni mocks</li>
-            <li><b>Piso 70/60</b>: si el total del servicio baja del umbral, el build falla y GitHub <b>bloquea el merge</b></li>
+            <li><b>Piso 70/60</b>: JaCoCo exige que al menos el <b>70% de las líneas</b> y el <b>60% de las ramas</b> (los dos caminos de cada <i>if/else</i>) de cada servicio estén cubiertas por pruebas. Si un cambio baja de ese piso, el build falla y GitHub <b>bloquea el merge</b></li>
             <li>Checkstyle + <b>branch protection</b> con check requerido en los 4 repos</li>
-            <li>Escribir la suite destapó <b class="accent">11 bugs reales</b> antes de producción</li>
           </ul>
         </div>
         <div class="txt">
